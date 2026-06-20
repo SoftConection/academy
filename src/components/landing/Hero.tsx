@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, PlayCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero.jpg";
@@ -31,8 +32,8 @@ export function Hero() {
             Academy forma estudantes, instrutores e equipas de empresas num só ecossistema.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button variant="brand" size="xl">
-              Explorar cursos <ArrowRight className="h-4 w-4" />
+            <Button asChild variant="brand" size="xl">
+              <Link to="/courses">Explorar cursos <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button variant="outline" size="xl">
               <PlayCircle className="h-5 w-5" /> Ver demonstração

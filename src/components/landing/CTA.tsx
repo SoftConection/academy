@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -13,8 +14,8 @@ export function CTA() {
           Democratizar a educação e a formação profissional através de tecnologia moderna.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Button variant="hero" size="xl">
-            Criar conta gratuita <ArrowRight className="h-4 w-4" />
+          <Button asChild variant="hero" size="xl">
+            <Link to="/auth">Criar conta gratuita <ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
       </div>
