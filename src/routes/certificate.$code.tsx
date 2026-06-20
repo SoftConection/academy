@@ -1,4 +1,6 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 import { BadgeCheck, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Card } from "@/components/ui/card";
@@ -12,6 +14,20 @@ export const Route = createFileRoute("/certificate/$code")({
 function CertificatePage() {
   const { code } = useParams({ from: "/certificate/$code" });
   const cert = certificates.find((c) => c.code === code) ?? certificates[0];
+
+  const verifyUrl = `https://openvision.academy/certificate/${cert.code}`;
+  const [qr, setQr] = useState<string>("");
+
+  useEffect(() => {
+    QRCode.toDataURL(verifyUrl, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 240,
+      color: { dark: "#0a0a0a", light: "#ffffff" },
+    })
+      .then(setQr)
+      .catch(() => setQr(""));
+  }, [verifyUrl]);
 
   return (
     <div className="min-h-screen bg-gradient-hero px-4 py-12">
@@ -37,11 +53,15 @@ function CertificatePage() {
               <div><p className="text-muted-foreground">Data de conclusão</p><p className="font-semibold">{cert.date}</p></div>
               <div><p className="text-muted-foreground">Código de verificação</p><p className="font-mono font-semibold">{cert.code}</p></div>
               <div className="flex items-end justify-end">
-                <div className="grid grid-cols-5 gap-0.5" aria-hidden>
-                  {Array.from({ length: 25 }).map((_, i) => (
-                    <span key={i} className={(i * 7) % 3 === 0 ? "h-2.5 w-2.5 bg-foreground" : "h-2.5 w-2.5 bg-transparent"} />
-                  ))}
-                </div>
+                {qr ? (
+                  <img
+                    src={qr}
+                    alt={`QR code de verificação do certificado ${cert.code}`}
+                    className="h-24 w-24 rounded-md border border-border bg-white p-1"
+                  />
+                ) : (
+                  <div className="h-24 w-24 animate-pulse rounded-md bg-muted" aria-hidden />
+                )}
               </div>
             </div>
           </div>
