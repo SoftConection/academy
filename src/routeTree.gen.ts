@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,6 +20,11 @@ import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorRoute = InstructorRouteImport.update({
+  id: '/instructor',
+  path: '/instructor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses': typeof CoursesIndexRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/instructor'
     | '/sitemap.xml'
     | '/courses/$courseId'
     | '/courses/'
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/instructor'
     | '/sitemap.xml'
     | '/courses/$courseId'
     | '/courses'
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/instructor'
     | '/sitemap.xml'
     | '/courses/$courseId'
     | '/courses/'
@@ -103,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  InstructorRoute: typeof InstructorRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
@@ -115,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor': {
+      id: '/instructor'
+      path: '/instructor'
+      fullPath: '/instructor'
+      preLoaderRoute: typeof InstructorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -159,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  InstructorRoute: InstructorRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   CoursesIndexRoute: CoursesIndexRoute,
