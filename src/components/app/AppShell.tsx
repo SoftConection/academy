@@ -11,6 +11,7 @@ import {
   Bell,
   Search,
   BadgeCheck,
+  ClipboardList,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const nav = [
   ]},
   { group: "Gestão", items: [
     { label: "Admin", to: "/admin", icon: ShieldCheck },
+    { label: "Inscrições", to: "/inscricoes", icon: ClipboardList },
     { label: "Certificados", to: "/certificate/OV-2026-AX91KD", icon: BadgeCheck },
   ]},
 ];
