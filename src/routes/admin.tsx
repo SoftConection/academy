@@ -21,12 +21,10 @@ function AdminPage() {
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <h3 className="font-display font-bold">Receita (milhões Kz)</h3>
-          <div className="mt-6 flex h-56 items-end gap-3">
+          <div className="mt-6 flex h-56 items-stretch gap-3">
             {revenueByMonth.map((r) => (
-              <div key={r.month} className="flex flex-1 flex-col items-center gap-2">
-                <div className="flex w-full flex-1 items-end">
-                  <div className="w-full rounded-t-md bg-gradient-brand transition-all" style={{ height: `${(r.value / max) * 100}%` }} />
-                </div>
+              <div key={r.month} className="flex flex-1 flex-col items-center justify-end gap-2">
+                <div className="w-full rounded-t-md bg-gradient-brand transition-all" style={{ height: `${(r.value / max) * 90 + 10}%` }} />
                 <span className="text-xs text-muted-foreground">{r.month}</span>
               </div>
             ))}
