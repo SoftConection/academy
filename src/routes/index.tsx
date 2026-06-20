@@ -1,29 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/landing/Header";
+import { Hero } from "@/components/landing/Hero";
+import { Features } from "@/components/landing/Features";
+import { Audience } from "@/components/landing/Audience";
+import { Enterprise } from "@/components/landing/Enterprise";
+import { CTA } from "@/components/landing/CTA";
+import { Footer } from "@/components/landing/Footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "OpenVision Academy — Aprenda as tecnologias do futuro" },
+      {
+        name: "description",
+        content:
+          "Academia digital de IA, engenharia de software, cloud e cibersegurança. Para estudantes, instrutores e empresas. Formação com certificação verificável.",
+      },
+      { property: "og:title", content: "OpenVision Academy" },
+      {
+        property: "og:description",
+        content:
+          "Aprenda, ensine e certifique num ecossistema digital de classe mundial.",
+      },
+      { property: "og:type", content: "website" },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <Audience />
+        <Enterprise />
+        <CTA />
+      </main>
+      <Footer />
     </div>
   );
 }
