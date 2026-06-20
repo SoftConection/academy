@@ -77,7 +77,9 @@ function CourseDetail() {
             ) : (
               <>
                 <p className="font-display text-3xl font-extrabold">{formatKz(course.price)}</p>
-                <Button variant="brand" size="lg" className="mt-5 w-full">Inscrever-me</Button>
+                <Button asChild variant="brand" size="lg" className="mt-5 w-full">
+                  <Link to="/courses/$courseId/enroll" params={{ courseId: course.id }}>Inscrever-me</Link>
+                </Button>
                 <Button variant="outline" size="lg" className="mt-3 w-full">Adicionar à lista</Button>
               </>
             )}
