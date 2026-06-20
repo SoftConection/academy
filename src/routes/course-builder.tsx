@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/course-builder")({
   head: () => ({ meta: [{ title: "Course Builder — OpenVision Academy" }] }),
-  component: CourseBuilder;
+  component: CourseBuilder,
 });
 
 type Lesson = { id: number; title: string; type: "video" | "pdf" | "quiz" };
