@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,8 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="sm">Entrar</Button>
-          <Button variant="brand" size="sm">Começar agora</Button>
+          <Button asChild variant="ghost" size="sm"><Link to="/auth">Entrar</Link></Button>
+          <Button asChild variant="brand" size="sm"><Link to="/courses">Começar agora</Link></Button>
         </div>
         <button
           className="md:hidden"
@@ -55,8 +56,8 @@ export function Header() {
               </a>
             ))}
             <div className="mt-2 flex gap-3">
-              <Button variant="outline" size="sm" className="flex-1">Entrar</Button>
-              <Button variant="brand" size="sm" className="flex-1">Começar</Button>
+              <Button asChild variant="outline" size="sm" className="flex-1"><Link to="/auth">Entrar</Link></Button>
+              <Button asChild variant="brand" size="sm" className="flex-1"><Link to="/courses">Começar</Link></Button>
             </div>
           </nav>
         </div>

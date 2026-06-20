@@ -18,6 +18,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
+import { Route as CertificateCodeRouteImport } from './routes/certificate.$code'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -64,6 +65,11 @@ const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CertificateCodeRoute = CertificateCodeRouteImport.update({
+  id: '/certificate/$code',
+  path: '/certificate/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/certificate/$code': typeof CertificateCodeRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/certificate/$code': typeof CertificateCodeRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses': typeof CoursesIndexRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/certificate/$code': typeof CertificateCodeRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/instructor'
     | '/sitemap.xml'
+    | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses/'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/instructor'
     | '/sitemap.xml'
+    | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/instructor'
     | '/sitemap.xml'
+    | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses/'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   InstructorRoute: typeof InstructorRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  CertificateCodeRoute: typeof CertificateCodeRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
 }
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/certificate/$code': {
+      id: '/certificate/$code'
+      path: '/certificate/$code'
+      fullPath: '/certificate/$code'
+      preLoaderRoute: typeof CertificateCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   InstructorRoute: InstructorRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  CertificateCodeRoute: CertificateCodeRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   CoursesIndexRoute: CoursesIndexRoute,
 }
