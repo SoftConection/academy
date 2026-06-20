@@ -12,6 +12,16 @@ export type Course = {
   progress?: number;
   color: string;
   summary: string;
+  startDate: string;
+  bank: BankDetails;
+};
+
+export type BankDetails = {
+  bankName: string;
+  accountHolder: string;
+  iban: string;
+  account: string;
+  reference: string;
 };
 
 export const courses: Course[] = [
@@ -30,6 +40,14 @@ export const courses: Course[] = [
     color: "from-amber-400 to-orange-600",
     summary:
       "Domine os conceitos centrais de IA, machine learning e redes neuronais com projetos práticos.",
+    startDate: "2026-07-15T09:00:00",
+    bank: {
+      bankName: "Banco BAI",
+      accountHolder: "OpenVision Academy — IA",
+      iban: "AO06 0040 0000 1234 5678 9011 2",
+      account: "123456789011",
+      reference: "IA-FUND",
+    },
   },
   {
     id: "react-pro",
@@ -46,6 +64,14 @@ export const courses: Course[] = [
     color: "from-orange-400 to-red-600",
     summary:
       "Construa interfaces modernas, performáticas e acessíveis com React, TypeScript e boas práticas.",
+    startDate: "2026-07-20T18:00:00",
+    bank: {
+      bankName: "Banco BIC",
+      accountHolder: "OpenVision Academy — Software",
+      iban: "AO06 0051 0000 2345 6789 0122 3",
+      account: "234567890122",
+      reference: "REACT-PRO",
+    },
   },
   {
     id: "cloud-aws",
@@ -62,6 +88,14 @@ export const courses: Course[] = [
     color: "from-amber-500 to-orange-700",
     summary:
       "Arquiteturas escaláveis, CI/CD, containers e infraestrutura como código na cloud.",
+    startDate: "2026-08-03T09:00:00",
+    bank: {
+      bankName: "Banco Atlântico",
+      accountHolder: "OpenVision Academy — Cloud",
+      iban: "AO06 0055 0000 3456 7890 1233 4",
+      account: "345678901233",
+      reference: "CLOUD-AWS",
+    },
   },
   {
     id: "ciberseguranca",
@@ -77,6 +111,14 @@ export const courses: Course[] = [
     color: "from-red-400 to-orange-600",
     summary:
       "Proteja sistemas, aprenda ethical hacking e implemente defesa em profundidade.",
+    startDate: "2026-07-28T18:00:00",
+    bank: {
+      bankName: "Banco BFA",
+      accountHolder: "OpenVision Academy — Cyber",
+      iban: "AO06 0006 0000 4567 8901 2344 5",
+      account: "456789012344",
+      reference: "CYBER-ESS",
+    },
   },
   {
     id: "data-science",
@@ -92,6 +134,14 @@ export const courses: Course[] = [
     color: "from-orange-300 to-red-500",
     summary:
       "Análise de dados, visualização e modelos preditivos com Python e ferramentas modernas.",
+    startDate: "2026-08-10T09:00:00",
+    bank: {
+      bankName: "Banco Sol",
+      accountHolder: "OpenVision Academy — Dados",
+      iban: "AO06 0044 0000 5678 9012 3455 6",
+      account: "567890123455",
+      reference: "DATA-SCI",
+    },
   },
   {
     id: "empreendedorismo",
@@ -107,6 +157,14 @@ export const courses: Course[] = [
     color: "from-amber-400 to-orange-500",
     summary:
       "Transforme ideias em negócios escaláveis com estratégia, produto e crescimento.",
+    startDate: "2026-07-18T18:00:00",
+    bank: {
+      bankName: "Banco Keve",
+      accountHolder: "OpenVision Academy — Negócios",
+      iban: "AO06 0049 0000 6789 0123 4566 7",
+      account: "678901234566",
+      reference: "EMP-DIG",
+    },
   },
 ];
 
@@ -179,3 +237,19 @@ export const recentUsers = [
 
 export const formatKz = (v: number) =>
   new Intl.NumberFormat("pt-AO", { maximumFractionDigits: 0 }).format(v) + " Kz";
+
+export const formatDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("pt-AO", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+/** Deadline = 24h before the course start date. */
+export const enrollmentDeadline = (startDate: string) =>
+  new Date(new Date(startDate).getTime() - 24 * 60 * 60 * 1000);
+
+export const isEnrollmentOpen = (startDate: string) =>
+  Date.now() < enrollmentDeadline(startDate).getTime();
