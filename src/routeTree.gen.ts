@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as CertificateCodeRouteImport } from './routes/certificate.$code'
+import { Route as CoursesCourseIdEnrollRouteImport } from './routes/courses.$courseId.enroll'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -70,6 +71,11 @@ const CertificateCodeRoute = CertificateCodeRouteImport.update({
   path: '/certificate/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesCourseIdEnrollRoute = CoursesCourseIdEnrollRouteImport.update({
+  id: '/enroll',
+  path: '/enroll',
+  getParentRoute: () => CoursesCourseIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,8 +86,9 @@ export interface FileRoutesByFullPath {
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/certificate/$code': typeof CertificateCodeRoute
-  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRouteWithChildren
   '/courses/': typeof CoursesIndexRoute
+  '/courses/$courseId/enroll': typeof CoursesCourseIdEnrollRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,8 +99,9 @@ export interface FileRoutesByTo {
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/certificate/$code': typeof CertificateCodeRoute
-  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRouteWithChildren
   '/courses': typeof CoursesIndexRoute
+  '/courses/$courseId/enroll': typeof CoursesCourseIdEnrollRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,8 +113,9 @@ export interface FileRoutesById {
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/certificate/$code': typeof CertificateCodeRoute
-  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRouteWithChildren
   '/courses/': typeof CoursesIndexRoute
+  '/courses/$courseId/enroll': typeof CoursesCourseIdEnrollRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses/'
+    | '/courses/$courseId/enroll'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses'
+    | '/courses/$courseId/enroll'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/certificate/$code'
     | '/courses/$courseId'
     | '/courses/'
+    | '/courses/$courseId/enroll'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -156,7 +168,7 @@ export interface RootRouteChildren {
   InstructorRoute: typeof InstructorRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CertificateCodeRoute: typeof CertificateCodeRoute
-  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRouteWithChildren
   CoursesIndexRoute: typeof CoursesIndexRoute
 }
 
@@ -232,8 +244,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CertificateCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/$courseId/enroll': {
+      id: '/courses/$courseId/enroll'
+      path: '/enroll'
+      fullPath: '/courses/$courseId/enroll'
+      preLoaderRoute: typeof CoursesCourseIdEnrollRouteImport
+      parentRoute: typeof CoursesCourseIdRoute
+    }
   }
 }
+
+interface CoursesCourseIdRouteChildren {
+  CoursesCourseIdEnrollRoute: typeof CoursesCourseIdEnrollRoute
+}
+
+const CoursesCourseIdRouteChildren: CoursesCourseIdRouteChildren = {
+  CoursesCourseIdEnrollRoute: CoursesCourseIdEnrollRoute,
+}
+
+const CoursesCourseIdRouteWithChildren = CoursesCourseIdRoute._addFileChildren(
+  CoursesCourseIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -244,7 +275,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorRoute: InstructorRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CertificateCodeRoute: CertificateCodeRoute,
-  CoursesCourseIdRoute: CoursesCourseIdRoute,
+  CoursesCourseIdRoute: CoursesCourseIdRouteWithChildren,
   CoursesIndexRoute: CoursesIndexRoute,
 }
 export const routeTree = rootRouteImport
