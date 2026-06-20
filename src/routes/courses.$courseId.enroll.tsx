@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { courses, formatKz, formatDateTime, enrollmentDeadline, isEnrollmentOpen } from "@/lib/mock-data";
+import { Countdown } from "@/components/app/Countdown";
+import { addEnrollment, makeReference } from "@/lib/enrollments";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/courses/$courseId/enroll")({
@@ -23,9 +25,7 @@ function Enroll() {
   const navigate = useNavigate();
   const course = courses.find((c) => c.id === courseId) ?? courses[0];
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "", payment: "transfer" });
-  const [submitted, setSubmitted] = useState(false);
-
-  const open = isEnrollmentOpen(course.startDate);
+  const [open, setOpen] = useState(() => isEnrollmentOpen(course.startDate));
   const deadline = enrollmentDeadline(course.startDate);
 
   function copy(text: string, label: string) {
@@ -49,34 +49,19 @@ function Enroll() {
       toast.error("Indique um número de telefone para contacto.");
       return;
     }
-    setSubmitted(true);
-    toast.success("Inscrição concluída! (demo)");
-  }
-
-  if (submitted) {
-    return (
-      <AppShell title="Inscrição concluída">
-        <Card className="mx-auto max-w-lg p-10 text-center">
-          <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
-          <h2 className="mt-4 font-display text-2xl font-extrabold">Está inscrito!</h2>
-          <p className="mt-2 text-muted-foreground">
-            A sua pré-inscrição em <strong>{course.title}</strong> foi registada. Conclua o pagamento por
-            transferência para as coordenadas indicadas e envie o comprovativo até <strong>{formatDateTime(deadline.toISOString())}</strong>.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Início do curso: {formatDateTime(course.startDate)}
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button variant="brand" onClick={() => navigate({ to: "/courses/$courseId", params: { courseId: course.id } })}>
-              Ver o curso
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/dashboard">Ir para o painel</Link>
-            </Button>
-          </div>
-        </Card>
-      </AppShell>
-    );
+    const enrollment = addEnrollment({
+      reference: makeReference(course.bank.reference),
+      courseId: course.id,
+      courseTitle: course.title,
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      notes: form.notes.trim(),
+      payment: form.payment,
+      amount: course.price,
+    });
+    toast.success("Inscrição submetida! (demo)");
+    navigate({ to: "/inscricao/$ref", params: { ref: enrollment.reference } });
   }
 
   return (
@@ -96,10 +81,13 @@ function Enroll() {
         <form onSubmit={onSubmit} className="lg:col-span-2">
           <Card className="mb-6 flex items-center gap-3 border-primary/30 bg-primary/5 p-4">
             <CalendarClock className="h-5 w-5 shrink-0 text-primary" />
-            <p className="text-sm">
-              Inscrições abertas até <strong>{formatDateTime(deadline.toISOString())}</strong> — 24h antes do início
-              ({formatDateTime(course.startDate)}).
-            </p>
+            <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
+              <p className="text-sm">
+                Inscrições fecham em <strong>24h antes</strong> do início
+                ({formatDateTime(course.startDate)}).
+              </p>
+              <Countdown target={deadline.getTime()} onExpire={() => setOpen(false)} />
+            </div>
           </Card>
 
           <Card className="p-6">
