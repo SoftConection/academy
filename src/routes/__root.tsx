@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "csfsvfsfv" },
+      { name: "description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "csfsvfsfv" },
+      { property: "og:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "csfsvfsfv" },
+      { name: "twitter:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87b08c62-baf0-41f5-8a25-fba9631b049e/id-preview-56394f77--2f55d3d3-5eca-40b8-8d37-276e465d8e7e.lovable.app-1781918666177.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87b08c62-baf0-41f5-8a25-fba9631b049e/id-preview-56394f77--2f55d3d3-5eca-40b8-8d37-276e465d8e7e.lovable.app-1781918666177.png" },
     ],
     links: [
       {
