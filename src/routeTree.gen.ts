@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WebhookDemoRouteImport } from './routes/webhook-demo'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as InscricoesRouteImport } from './routes/inscricoes'
@@ -24,6 +25,11 @@ import { Route as CertificateCodeRouteImport } from './routes/certificate.$code'
 import { Route as CoursesCourseIdIndexRouteImport } from './routes/courses.$courseId.index'
 import { Route as CoursesCourseIdEnrollRouteImport } from './routes/courses.$courseId.enroll'
 
+const WebhookDemoRoute = WebhookDemoRouteImport.update({
+  id: '/webhook-demo',
+  path: '/webhook-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/inscricoes': typeof InscricoesRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/webhook-demo': typeof WebhookDemoRoute
   '/certificate/$code': typeof CertificateCodeRoute
   '/courses/$courseId': typeof CoursesCourseIdRouteWithChildren
   '/inscricao/$ref': typeof InscricaoRefRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/inscricoes': typeof InscricoesRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/webhook-demo': typeof WebhookDemoRoute
   '/certificate/$code': typeof CertificateCodeRoute
   '/inscricao/$ref': typeof InscricaoRefRoute
   '/courses': typeof CoursesIndexRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/inscricoes': typeof InscricoesRoute
   '/instructor': typeof InstructorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/webhook-demo': typeof WebhookDemoRoute
   '/certificate/$code': typeof CertificateCodeRoute
   '/courses/$courseId': typeof CoursesCourseIdRouteWithChildren
   '/inscricao/$ref': typeof InscricaoRefRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/inscricoes'
     | '/instructor'
     | '/sitemap.xml'
+    | '/webhook-demo'
     | '/certificate/$code'
     | '/courses/$courseId'
     | '/inscricao/$ref'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/inscricoes'
     | '/instructor'
     | '/sitemap.xml'
+    | '/webhook-demo'
     | '/certificate/$code'
     | '/inscricao/$ref'
     | '/courses'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/inscricoes'
     | '/instructor'
     | '/sitemap.xml'
+    | '/webhook-demo'
     | '/certificate/$code'
     | '/courses/$courseId'
     | '/inscricao/$ref'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   InscricoesRoute: typeof InscricoesRoute
   InstructorRoute: typeof InstructorRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WebhookDemoRoute: typeof WebhookDemoRoute
   CertificateCodeRoute: typeof CertificateCodeRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRouteWithChildren
   InscricaoRefRoute: typeof InscricaoRefRoute
@@ -210,6 +223,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/webhook-demo': {
+      id: '/webhook-demo'
+      path: '/webhook-demo'
+      fullPath: '/webhook-demo'
+      preLoaderRoute: typeof WebhookDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -334,6 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   InscricoesRoute: InscricoesRoute,
   InstructorRoute: InstructorRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WebhookDemoRoute: WebhookDemoRoute,
   CertificateCodeRoute: CertificateCodeRoute,
   CoursesCourseIdRoute: CoursesCourseIdRouteWithChildren,
   InscricaoRefRoute: InscricaoRefRoute,

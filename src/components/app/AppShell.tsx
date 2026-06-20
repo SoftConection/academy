@@ -12,6 +12,7 @@ import {
   Search,
   BadgeCheck,
   ClipboardList,
+  Webhook,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const nav = [
   { group: "Gestão", items: [
     { label: "Admin", to: "/admin", icon: ShieldCheck },
     { label: "Inscrições", to: "/inscricoes", icon: ClipboardList },
+    { label: "Webhook pagamentos", to: "/webhook-demo", icon: Webhook },
     { label: "Certificados", to: "/certificate/OV-2026-AX91KD", icon: BadgeCheck },
   ]},
 ];
