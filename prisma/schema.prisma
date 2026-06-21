@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  domain    String?
+  logoUrl   String?  @map("logo_url")
+  plan      String?
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  Users     User[]
+  Courses   Course[]
+  Enrollments Enrollment[]
+  @@map("tenants")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String?  @map("tenant_id")
+  email        String
+  emailVerified Boolean @default(false) @map("email_verified")
+  passwordHash String?  @map("password_hash")
+  displayName  String?  @map("display_name")
+  avatarUrl    String?  @map("avatar_url")
+  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  tenant       Tenant?  @relation(fields: [tenantId], references: [id])
+  Roles        UserRole[]
+  CoursesOwned Course[] @relation("InstructorCourses")
+  Enrollments  Enrollment[]
+
+  @@map("users")
+  @@index([tenantId])
+}
+
+model Role {
+  id        String  @id @default(uuid())
+  tenantId  String?
+  name      String
+  description String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  RolePermissions RolePermission[]
+  UserRoles       UserRole[]
+  @@map("roles")
+}
+
+model Permission {
+  id        String  @id @default(uuid())
+  name      String
+  resource  String?
+  action    String?
+  description String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  RolePermissions RolePermission[]
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("role_permissions")
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id      String @id @default(uuid())
+  userId  String @map("user_id")
+  roleId  String @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_roles")
+  @@unique([userId, roleId])
+}
+
+model Course {
+  id           String   @id @default(uuid())
+  tenantId     String?  @map("tenant_id")
+  instructorId String?  @map("instructor_id")
+  title        String
+  slug         String
+  description  String?
+  published    Boolean  @default(false)
+  visibility   String?  @default("private")
+  price        Float?   @default(0)
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  tenant       Tenant?  @relation(fields: [tenantId], references: [id])
+  Instructor   User?    @relation("InstructorCourses", fields: [instructorId], references: [id])
+  Modules      Module[]
+  Enrollments  Enrollment[]
+
+  @@map("courses")
+  @@unique([tenantId, slug])
+}
+
+model Module {
+  id        String @id @default(uuid())
+  courseId  String @map("course_id")
+  title     String
+  order     Int    @default(0) @map("order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  Course    Course @relation(fields: [courseId], references: [id])
+  Lessons   Lesson[]
+  @@map("modules")
+}
+
+model Lesson {
+  id        String @id @default(uuid())
+  moduleId  String @map("module_id")
+  title     String
+  contentType String? @map("content_type")
+  content   Json?
+  durationSeconds Int? @map("duration_seconds")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  Module    Module @relation(fields: [moduleId], references: [id])
+  Resources Resource[]
+  @@map("lessons")
+}
+
+model Resource {
+  id        String @id @default(uuid())
+  lessonId  String @map("lesson_id")
+  type      String
+  url       String
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  Lesson    Lesson @relation(fields: [lessonId], references: [id])
+  @@map("resources")
+}
+
+model Enrollment {
+  id         String @id @default(uuid())
+  tenantId   String? @map("tenant_id")
+  userId     String @map("user_id")
+  courseId   String @map("course_id")
+  status     String @default("active")
+  progress   Float?  @default(0) 
+  startedAt  DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  User       User   @relation(fields: [userId], references: [id])
+  Course     Course @relation(fields: [courseId], references: [id])
+  Payments   Payment[]
+  Certificate Certificate?
+
+  @@map("enrollments")
+  @@unique([userId, courseId])
+}
+
+model Payment {
+  id           String @id @default(uuid())
+  tenantId     String?
+  enrollmentId String? @map("enrollment_id")
+  amount       Float
+  currency     String @default("AOA")
+  gateway      String?
+  gatewayReference String? @map("gateway_reference")
+  status       String @default("pending")
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  Enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id])
+  @@map("payments")
+}
+
+model Certificate {
+  id           String @id @default(uuid())
+  tenantId     String?
+  enrollmentId String @map("enrollment_id")
+  code         String @unique
+  qrCodeUrl    String? @map("qr_code_url")
+  issuedAt     DateTime @default(now()) @map("issued_at")
+  metadata     Json?
+
+  Enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  @@map("certificates")
+}
+
+model Message {
+  id         String @id @default(uuid())
+  tenantId   String?
+  senderId   String? @map("sender_id")
+  recipientId String? @map("recipient_id")
+  content    String?
+  attachments Json?
+  read       Boolean @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("messages")
+}
+
+model Notification {
+  id        String @id @default(uuid())
+  tenantId  String?
+  userId    String?
+  type      String?
+  payload   Json?
+  read      Boolean @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id        String @id @default(uuid())
+  tenantId  String?
+  userId    String?
+  action    String?
+  resource  String?
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+model EmailLog {
+  id        String @id @default(uuid())
+  tenantId  String?
+  toEmail   String? @map("to_email")
+  subject   String?
+  template  String?
+  status    String?
+  response  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("email_logs")
+}
+
+model AnalyticsEvent {
+  id        String @id @default(uuid())
+  tenantId  String?
+  userId    String?
+  eventName String? @map("event_name")
+  properties Json?
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  @@map("analytics_events")
+}
+
+model Configuration {
+  id        String @id @default(uuid())
+  tenantId  String?
+  key       String
+  value     Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("configurations")
+}

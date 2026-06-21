@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -39,7 +38,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // Local error reporting fallback (remove third-party integrations)
+    // TODO: integrate with Sentry/BetterStack when configured
+    console.error("Captured error in root boundary:", error);
   }, [error]);
 
   return (
@@ -78,24 +79,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "csfsvfsfv" },
+      { title: "OpenVision Academy" },
       { name: "description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "OpenVision" },
       { property: "og:title", content: "csfsvfsfv" },
       { property: "og:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
+      { property: "og:image", content: "/og-image.svg" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@OpenVision" },
       { name: "twitter:title", content: "csfsvfsfv" },
       { name: "twitter:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87b08c62-baf0-41f5-8a25-fba9631b049e/id-preview-56394f77--2f55d3d3-5eca-40b8-8d37-276e465d8e7e.lovable.app-1781918666177.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87b08c62-baf0-41f5-8a25-fba9631b049e/id-preview-56394f77--2f55d3d3-5eca-40b8-8d37-276e465d8e7e.lovable.app-1781918666177.png" },
+      { name: "twitter:image", content: "/og-image.svg" },
+      // Remove third-party branded preview images; use tenant-specific OG images when available
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
