@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { reportError } from "@/lib/error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -38,9 +39,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    // Local error reporting fallback (remove third-party integrations)
-    // TODO: integrate with Sentry/BetterStack when configured
-    console.error("Captured error in root boundary:", error);
+    reportError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -82,29 +81,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "OpenVision Academy" },
       { name: "description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
       { name: "author", content: "OpenVision" },
-      { property: "og:title", content: "csfsvfsfv" },
+      { property: "og:title", content: "OpenVision Academy" },
       { property: "og:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
       { property: "og:image", content: "/og-image.svg" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@OpenVision" },
-      { name: "twitter:title", content: "csfsvfsfv" },
+      { name: "twitter:title", content: "OpenVision Academy" },
       { name: "twitter:description", content: "OpenVision Academy Hub is a comprehensive platform for learning, teaching, and professional training." },
       { name: "twitter:image", content: "/og-image.svg" },
-      // Remove third-party branded preview images; use tenant-specific OG images when available
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: appCss },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
       },
+      { rel: "icon", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,
