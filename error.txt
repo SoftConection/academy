@@ -1,37 +1,42 @@
-2:23.148 
-   │                                               ╰─────────────────── Module not found, treating it as an external dependency
-03:22:23.148 
-───╯
+03:22:09.842 Running build in Washington, D.C., USA (East) – iad1
+03:22:09.842 Build machine configuration: 2 cores, 8 GB
+03:22:09.967 Cloning github.com/SoftConection/academy (Branch: main, Commit: dfc7364)
+03:22:10.204 Cloning completed: 237.000ms
+03:22:10.646 Skipping build cache since Package Manager changed from "bun" to "npm"
+03:22:10.831 Running "vercel build"
+03:22:10.847 Vercel CLI 54.14.0
+03:22:11.437 Installing dependencies...
+03:22:22.752 
+03:22:22.753 added 441 packages in 11s
+03:22:22.754 
+03:22:22.755 94 packages are looking for funding
+03:22:22.755   run `npm fund` for details
+03:22:22.827 Running "npm run build"
+03:22:22.935 
+03:22:22.935 > build
+03:22:22.936 > vite build
+03:22:22.936 
+03:22:23.147 vite.config.ts (7:29) [UNRESOLVED_IMPORT] Could not resolve '@lovable.dev/vite-tanstack-config' in vite.config.ts
+03:22:23.148    ╭─[ vite.config.ts:7:30 ]
+03:22:23.148    │
+03:22:23.148  7 │ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+03:22:23.148    │                              ─────────────────┬─────────────────  
+03:22:23.148    │                                               ╰─────────────────── Module not found, treating it as an external dependency
+03:22:23.148 ───╯
 03:22:23.149 
-03:22:23.154 
-failed to load config from /vercel/path0/vite.config.ts
-03:22:23.155 
-error during build:
-03:22:23.155 
-Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@lovable.dev/vite-tanstack-config' imported from /vercel/path0/node_modules/.vite-temp/vite.config.ts.timestamp-1782008543152-921266b7d1e8c.mjs
-03:22:23.156 
-    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
-03:22:23.156 
-    at packageResolve (node:internal/modules/esm/resolve:764:81)
-03:22:23.156 
-    at moduleResolve (node:internal/modules/esm/resolve:855:18)
-03:22:23.156 
-    at defaultResolve (node:internal/modules/esm/resolve:988:11)
-03:22:23.156 
-    at #cachedDefaultResolve (node:internal/modules/esm/loader:697:20)
-03:22:23.156 
-    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:714:38)
-03:22:23.157 
-    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:746:52)
-03:22:23.157 
-    at #resolve (node:internal/modules/esm/loader:679:17)
-03:22:23.157 
-    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:599:35)
-03:22:23.157 
-    at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33) {
-03:22:23.157 
-  code: 'ERR_MODULE_NOT_FOUND'
-03:22:23.157 
-}
-03:22:23.177 
-Error: Command "npm run build" exited with 1
+03:22:23.154 failed to load config from /vercel/path0/vite.config.ts
+03:22:23.155 error during build:
+03:22:23.155 Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@lovable.dev/vite-tanstack-config' imported from /vercel/path0/node_modules/.vite-temp/vite.config.ts.timestamp-1782008543152-921266b7d1e8c.mjs
+03:22:23.156     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+03:22:23.156     at packageResolve (node:internal/modules/esm/resolve:764:81)
+03:22:23.156     at moduleResolve (node:internal/modules/esm/resolve:855:18)
+03:22:23.156     at defaultResolve (node:internal/modules/esm/resolve:988:11)
+03:22:23.156     at #cachedDefaultResolve (node:internal/modules/esm/loader:697:20)
+03:22:23.156     at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:714:38)
+03:22:23.157     at ModuleLoader.resolveSync (node:internal/modules/esm/loader:746:52)
+03:22:23.157     at #resolve (node:internal/modules/esm/loader:679:17)
+03:22:23.157     at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:599:35)
+03:22:23.157     at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33) {
+03:22:23.157   code: 'ERR_MODULE_NOT_FOUND'
+03:22:23.157 }
+03:22:23.177 Error: Command "npm run build" exited with 1
