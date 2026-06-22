@@ -12,6 +12,12 @@ Vercel: private package install instructions
 3) Trigger a new deployment; Vercel will use the token to install private
    packages (e.g., `@lovable.dev/*`).
 
+4) (Optional) GitHub Actions CI — add `NPM_TOKEN` as a repository secret:
+   - In the GitHub repository → Settings → Secrets → Actions, add `NPM_TOKEN`.
+   - The included workflow `.github/workflows/ci.yml` will use this secret to
+     authenticate with npm and run `npm ci`, `npm run lint` and `npm run build`
+     for every push and pull request.
+
 Notes:
 - If Lovable packages are hosted in a private registry other than npmjs.org,
   update the `.npmrc` to point to that registry and set the appropriate token.

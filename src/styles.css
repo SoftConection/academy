@@ -195,3 +195,8 @@
     box-shadow: var(--shadow-soft);
   }
 }
+
+/* Hide legacy badge shown above hero title (temporary fix until rebuild) */
+#top .inline-flex.items-center.gap-2 {
+  display: none !important;
+}

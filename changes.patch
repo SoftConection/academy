@@ -1,0 +1,259 @@
+*** Patch: repository changes for review
+
+*** AGENTS.md
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@
+-<!-- LOVABLE:BEGIN -->
+-> [!IMPORTANT]
+-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
+-> published git history — force pushing, or rebasing/amending/squashing commits
+-> that are already pushed — as it rewrites history on Lovable's side and the
+-> user will likely lose their project history.
+->
+-> Commits you push to the connected branch sync back to Lovable and show up in
+-> the editor, so keep the branch in a working state.
+-<!-- LOVABLE:END -->
++<!-- LOVABLE:BEGIN -->
++> [!IMPORTANT]
++> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
++> published git history — force pushing, or rebasing/amending/squashing commits
++> that are already pushed — as it rewrites history on Lovable's side and the
++> user will likely lose their project history.
++>
++> Commits you push to the connected branch sync back to Lovable and show up in
++> the editor, so keep the branch in a working state.
++<!-- LOVABLE:END -->
+
+*** bunfig.toml
+--- a/bunfig.toml
++++ b/bunfig.toml
+@@
+-minimumReleaseAgeExcludes = ["@lovable.dev/vite-tanstack-config", "@lovable.dev/mcp-js", "@lovable.dev/vite-plugin-dev-server-bridge", "@lovable.dev/vite-plugin-hmr-gate"]
++minimumReleaseAgeExcludes = []
+
+*** package.json (devDependencies excerpt)
+--- a/package.json
++++ b/package.json
+@@
+-    "@types/node": "^22.16.5",
+-    "@types/qrcode": "^1.5.6",
++    "@types/node": "^22.16.5",
++    "@lovable.dev/vite-tanstack-config": "^2.5.2",
++    "@types/qrcode": "^1.5.6",
+@@
+-    "vite": "^8.0.16"
++    "vite": "^8.0.16"
+
+*** vite.config.ts
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@
+-import { defineConfig } from "vite";
+-import react from "@vitejs/plugin-react";
+-import tailwind from "@tailwindcss/vite";
+-
+-export default defineConfig({
+-  plugins: [react(), tailwind()],
+-  resolve: { tsconfigPaths: true },
+-});
++// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
++// or the app will break with duplicate plugins:
++//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, nitro (build-only using cloudflare as a default target),
++//     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
++//     error logger plugins, and sandbox detection (port/host/strictPort).
++// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
++import { defineConfig } from "@lovable.dev/vite-tanstack-config";
++
++export default defineConfig({
++  tanstackStart: {
++    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
++    // nitro/vite builds from this
++    server: { entry: "server" },
++  },
++});
+
+*** .npmrc (new)
+--- a/.npmrc
++++ b/.npmrc
+@@
++@lovable.dev:registry=https://registry.npmjs.org/
++//registry.npmjs.org/:_authToken=${NPM_TOKEN}
++registry=https://registry.npmjs.org/
++
+*** docs/vercel-npmrc.md (new)
+--- a/docs/vercel-npmrc.md
++++ b/docs/vercel-npmrc.md
+@@
++Vercel: private package install instructions
++
++1) Add the `NPM_TOKEN` environment variable to your Vercel project:
++   - In the Vercel dashboard, open your project → Settings → Environment Variables.
++   - Add `NPM_TOKEN` with a read-only npm token (create one at https://www.npmjs.com/settings/tokens).
++   - Set it for the relevant environments (Preview/Production).
++
++2) The repository includes a `.npmrc` that references `${NPM_TOKEN}` for auth.
++   This file is safe to commit because it does not contain secrets — the token
++   is provided at build-time via the environment variable.
++
++3) Trigger a new deployment; Vercel will use the token to install private
++   packages (e.g., `@lovable.dev/*`).
++
++Notes:
++- If Lovable packages are hosted in a private registry other than npmjs.org,
++  update the `.npmrc` to point to that registry and set the appropriate token.
++- Alternatively, add a `.npmrc` file to your project via Vercel's UI or use a
++  private install script, but the environment-variable approach is recommended.
+
+*** index.html (new/added back)
+--- a/index.html
++++ b/index.html
+@@
++<!doctype html>
++<html lang="en">
++  <head>
++    <meta charset="utf-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>OpenVision Academy</title>
++  </head>
++  <body>
++    <div id="root"></div>
++    <script type="module" src="/src/main.tsx"></script>
++  </body>
++</html>
++
+*** src/main.tsx (new)
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@
++import React from 'react'
++import { createRoot } from 'react-dom/client'
++import { RouterProvider } from '@tanstack/react-router'
++import { getRouter } from './router'
++import './styles.css'
++
++const router = getRouter()
++
++createRoot(document.getElementById('root')!).render(
++  <React.StrictMode>
++    <RouterProvider router={router} />
++  </React.StrictMode>,
++)
++
+*** src/lib/error-reporting.ts (new)
+--- a/src/lib/error-reporting.ts
++++ b/src/lib/error-reporting.ts
+@@
++type ErrorOptions = {
++  mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
++  handled?: boolean;
++  severity?: "error" | "warning" | "info";
++};
++
++type MonitoringEvents = {
++  captureException?: (
++    error: unknown,
++    context?: Record<string, unknown>,
++    options?: ErrorOptions,
++  ) => void;
++};
++
++declare global {
++  interface Window {
++    __appEvents?: MonitoringEvents;
++  }
++}
++
++export function reportError(error: unknown, context: Record<string, unknown> = {}) {
++  if (typeof window === "undefined") return;
++  window.__appEvents?.captureException?.(
++    error,
++    {
++      source: "react_error_boundary",
++      route: window.location.pathname,
++      ...context,
++    },
++    {
++      mechanism: "react_error_boundary",
++      handled: false,
++      severity: "error",
++    },
++  );
++}
++
+*** src/lib/lovable-error-reporting.ts (deleted)
+--- a/src/lib/lovable-error-reporting.ts
++++ /dev/null
+@@
+-file removed
++
+*** src/styles.css (restored to Lovable original content)
+--- a/src/styles.css
++++ b/src/styles.css
+@@
++@import "tailwindcss" source(none);
++@source "../src";
++@import "tw-animate-css";
++
++@custom-variant dark (&:is(.dark *));
++
++@theme {
++  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
++  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
++}
++
++@theme inline {
++  --radius-sm: calc(var(--radius) - 4px);
++  --radius-md: calc(var(--radius) - 2px);
++  --radius-lg: var(--radius);
++  --radius-xl: calc(var(--radius) + 4px);
++  --radius-2xl: calc(var(--radius) + 8px);
++  --radius-3xl: calc(var(--radius) + 12px);
++  --radius-4xl: calc(var(--radius) + 16px);
++  --color-background: var(--background);
++  --color-foreground: var(--foreground);
++  --color-card: var(--card);
++  --color-card-foreground: var(--card-foreground);
++  --color-popover: var(--popover);
++  --color-popover-foreground: var(--popover-foreground);
++  --color-primary: var(--primary);
++  --color-primary-foreground: var(--primary-foreground);
++  --color-secondary: var(--secondary);
++  --color-secondary-foreground: var(--secondary-foreground);
++  --color-muted: var(--muted);
++  --color-muted-foreground: var(--muted-foreground);
++  --color-accent: var(--accent);
++  --color-accent-foreground: var(--accent-foreground);
++  --color-destructive: var(--destructive);
++  --color-destructive-foreground: var(--destructive-foreground);
++  --color-border: var(--border);
++  --color-input: var(--input);
++  --color-ring: var(--ring);
++  --color-ring-offset-background: var(--background);
++  --color-chart-1: var(--chart-1);
++  --color-chart-2: var(--chart-2);
++  --color-chart-3: var(--chart-3);
++  --color-chart-4: var(--chart-4);
++  --color-chart-5: var(--chart-5);
++  --color-sidebar: var(--sidebar);
++  --color-sidebar-foreground: var(--sidebar-foreground);
++  --color-sidebar-primary: var(--sidebar-primary);
++  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
++  --color-sidebar-accent: var(--sidebar-accent);
++  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
++  --color-sidebar-border: var(--sidebar-border);
++  --color-sidebar-ring: var(--sidebar-ring);
++  --color-brand: var(--brand);
++  --color-brand-foreground: var(--brand-foreground);
++  --color-brand-amber: var(--brand-amber);
++}
++
++/* (file continues with restored variables and utility layers) */
++
+*** package-lock.json
+--- a/package-lock.json
++++ b/package-lock.json
+@@
++package-lock updated to include @lovable.dev packages (not shown here due to size)
++
+*** End of patch
