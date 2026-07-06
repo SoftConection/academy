@@ -30,7 +30,7 @@ function ReceiptPage() {
       <AppShell title="Comprovativo">
         <Card className="mx-auto max-w-lg p-10 text-center">
           <p className="text-muted-foreground">Inscrição não encontrada para a referência <strong>{ref}</strong>.</p>
-          <Button asChild variant="brand" className="mt-6"><Link to="/courses">Ver cursos</Link></Button>
+          <Button asChild variant="brand" className="mt-6"><Link to="/courses/">Ver cursos</Link></Button>
         </Card>
       </AppShell>
     );
@@ -144,7 +144,7 @@ function ReceiptPage() {
         )}
 
         <div className="flex justify-center gap-4 text-sm">
-          <Link to="/courses" className="font-medium text-primary">← Ver cursos</Link>
+          <Link to="/courses/" className="font-medium text-primary">← Ver cursos</Link>
           <Link to="/dashboard" className="font-medium text-primary">Ir para o painel</Link>
         </div>
       </div>

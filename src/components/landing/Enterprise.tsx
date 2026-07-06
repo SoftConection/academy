@@ -22,8 +22,10 @@ export function Enterprise() {
               Contratos corporativos com gestão centralizada, relatórios e certificação.
               O caminho para transformar competências em resultados.
             </p>
-            <Button variant="brand" size="xl" className="mt-8">
-              Falar com a equipa <ArrowRight className="h-4 w-4" />
+            <Button asChild variant="brand" size="xl" className="mt-8">
+              <a href="mailto:equipa@openvision.academy?subject=Plano%20Corporativo%20OpenVision">
+                Falar com a equipa <ArrowRight className="h-4 w-4" />
+              </a>
             </Button>
           </div>
           <div id="certificacao" className="grid gap-4 self-center">

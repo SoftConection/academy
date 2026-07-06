@@ -88,7 +88,7 @@ function CourseDetail() {
               <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Certificado verificável</p>
               <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Projetos práticos</p>
             </div>
-            <Link to="/courses" className="mt-6 block text-center text-sm font-medium text-primary">← Voltar ao catálogo</Link>
+            <Link to="/courses/" className="mt-6 block text-center text-sm font-medium text-primary">← Voltar ao catálogo</Link>
           </Card>
         </div>
       </div>

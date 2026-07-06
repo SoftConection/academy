@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { group: "Aprender", items: [
-    { label: "Catálogo", to: "/courses", icon: BookOpen },
+    { label: "Catálogo", to: "/courses/", icon: BookOpen },
     { label: "Meu painel", to: "/dashboard", icon: LayoutDashboard },
   ]},
   { group: "Ensinar", items: [
@@ -60,7 +60,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
               <p className="px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{g.group}</p>
               <ul className="mt-2 space-y-1">
                 {g.items.map((it) => {
-                  const active = path === it.to || (it.to !== "/courses" && path.startsWith(it.to));
+                  const active = path === it.to || (it.to !== "/courses/" && path.startsWith(it.to));
                   return (
                     <li key={it.to}>
                       <Link

@@ -33,10 +33,10 @@ export function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button asChild variant="brand" size="xl">
-              <Link to="/courses">Explorar cursos <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/courses/">Explorar cursos <ArrowRight className="h-4 w-4" /></Link>
             </Button>
-            <Button variant="outline" size="xl">
-              <PlayCircle className="h-5 w-5" /> Ver demonstração
+            <Button asChild variant="outline" size="xl">
+              <a href="#cursos"><PlayCircle className="h-5 w-5" /> Ver demonstração</a>
             </Button>
           </div>
           <dl className="mt-12 grid max-w-md grid-cols-3 gap-6">

@@ -32,7 +32,7 @@ export function Header() {
         </nav>
         <div className="hidden items-center gap-3 md:flex">
           <Button asChild variant="ghost" size="sm"><Link to="/auth">Entrar</Link></Button>
-          <Button asChild variant="brand" size="sm"><Link to="/courses">Começar agora</Link></Button>
+          <Button asChild variant="brand" size="sm"><Link to="/courses/">Começar agora</Link></Button>
         </div>
         <button
           className="md:hidden"
@@ -57,7 +57,7 @@ export function Header() {
             ))}
             <div className="mt-2 flex gap-3">
               <Button asChild variant="outline" size="sm" className="flex-1"><Link to="/auth">Entrar</Link></Button>
-              <Button asChild variant="brand" size="sm" className="flex-1"><Link to="/courses">Começar</Link></Button>
+              <Button asChild variant="brand" size="sm" className="flex-1"><Link to="/courses/">Começar</Link></Button>
             </div>
           </nav>
         </div>
