@@ -8,12 +8,12 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [
     tanstackStart(),
-    // Generate Vercel-compatible Nitro output instead of generic local output.
-    nitro({ preset: "vercel" }),
     // Keep React plugin after TanStack Start plugin as recommended by TanStack.
     react(),
     tsconfigPaths(),
     tailwindcss(),
+    // Generate Vercel-compatible Nitro output instead of generic local output.
+    nitro({ preset: "vercel" }),
   ],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
