@@ -53,7 +53,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-5">
           <Link to="/" aria-label="Início"><Logo /></Link>
-          <button className="lg:hidden" onClick={() => setOpen(false)} aria-label="Fechar"><X className="h-5 w-5" /></button>
+          <button type="button" className="lg:hidden" onClick={() => setOpen(false)} aria-label="Fechar"><X className="h-5 w-5" /></button>
         </div>
         <nav className="space-y-6 p-4">
           {nav.map((g) => (
@@ -90,7 +90,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur-xl sm:px-6">
-          <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="Abrir menu"><Menu className="h-5 w-5" /></button>
+          <button type="button" className="lg:hidden" onClick={() => setOpen(true)} aria-label="Abrir menu"><Menu className="h-5 w-5" /></button>
           <h1 className="font-display text-lg font-bold">{title}</h1>
           <div className="ml-auto hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground sm:flex">
             <Search className="h-4 w-4" /> Pesquisar...

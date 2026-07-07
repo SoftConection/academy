@@ -76,7 +76,7 @@ function AuthPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {mode === "login" ? "Ainda não tem conta? " : "Já tem conta? "}
-            <button className="font-semibold text-primary" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
+            <button type="button" className="font-semibold text-primary" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
               {mode === "login" ? "Registar" : "Entrar"}
             </button>
           </p>

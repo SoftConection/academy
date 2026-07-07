@@ -35,6 +35,7 @@ export function Header() {
           <Button asChild variant="brand" size="sm"><Link to="/courses/">Começar agora</Link></Button>
         </div>
         <button
+          type="button"
           className="md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Fechar menu" : "Abrir menu"}

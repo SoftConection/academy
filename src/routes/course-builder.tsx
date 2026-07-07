@@ -75,7 +75,7 @@ function CourseBuilder() {
                     <Icon className="h-4 w-4 text-primary" />
                     <span className="flex-1 text-sm">{l.title}</span>
                     <span className="text-xs uppercase text-muted-foreground">{l.type}</span>
-                    <button onClick={() => removeLesson(mod.id, l.id)} aria-label="Remover">
+                    <button type="button" onClick={() => removeLesson(mod.id, l.id)} aria-label="Remover">
                       <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                     </button>
                   </li>

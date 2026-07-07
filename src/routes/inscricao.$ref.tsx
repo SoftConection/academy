@@ -89,7 +89,7 @@ function ReceiptPage() {
                 <dt className="text-xs text-muted-foreground">Referência</dt>
                 <dd className="flex items-center gap-2 font-mono font-semibold">
                   {enrollment.reference}
-                  <button onClick={() => copy(enrollment.reference, "Referência")} aria-label="Copiar referência"
+                  <button type="button" onClick={() => copy(enrollment.reference, "Referência")} aria-label="Copiar referência"
                     className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground">
                     <Copy className="h-3.5 w-3.5" />
                   </button>
@@ -119,7 +119,7 @@ function ReceiptPage() {
                     <dt className="text-xs text-muted-foreground">{r.label}</dt>
                     <dd className={`truncate font-semibold ${r.mono ? "font-mono" : ""}`}>{r.value}</dd>
                   </div>
-                  <button onClick={() => copy(r.value, r.label)} aria-label={`Copiar ${r.label}`}
+                  <button type="button" onClick={() => copy(r.value, r.label)} aria-label={`Copiar ${r.label}`}
                     className="shrink-0 rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
                     <Copy className="h-4 w-4" />
                   </button>

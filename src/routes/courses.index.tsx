@@ -25,6 +25,7 @@ function CoursesPage() {
       <div className="flex flex-wrap gap-2">
         {categories.map((c) => (
           <button
+            type="button"
             key={c}
             onClick={() => setCat(c)}
             className={cn(

@@ -126,7 +126,7 @@ function WebhookDemo() {
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {pending.slice(0, 6).map((e) => (
-                  <button key={e.id} onClick={() => quickFill(e.reference, e.amount)}
+                  <button type="button" key={e.id} onClick={() => quickFill(e.reference, e.amount)}
                     className="rounded-lg border border-border px-2.5 py-1 font-mono text-xs hover:bg-accent">
                     {e.reference}
                   </button>
