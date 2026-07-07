@@ -205,12 +205,17 @@ export function SearchCommand() {
         aria-label="Pesquisar"
         className={cn(
           "fixed top-4 right-20 z-50 flex h-10 w-10 items-center justify-center rounded-full",
-          "bg-card border-2 border-border shadow-lg transition-all duration-300",
-          "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
+          "transition-all duration-300 shadow-lg",
+          open
+            ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
+            : "bg-card border-2 border-border hover:bg-secondary hover:border-brand hover:shadow-xl",
           "active:scale-95"
         )}
       >
-        <Search className="h-5 w-5" />
+        <Search className={cn(
+          "h-5 w-5 transition-all duration-300",
+          open ? "text-brand-foreground rotate-45 scale-110" : "text-muted-foreground hover:text-foreground"
+        )} />
       </button>
 
       {/* Search Dialog */}
