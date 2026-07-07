@@ -70,11 +70,24 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
         />
       )}
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-4 items-end">
+      {/* Profile/Settings Button - Top Right */}
+      <button
+        onClick={handleSettingsClick}
+        aria-label="Perfil e definições"
+        className={cn(
+          "fixed top-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
+          "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
+          "active:scale-95"
+        )}
+      >
+        <User className="h-6 w-6" />
+      </button>
+
+      {/* Primary Navigation Button - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
         {/* Navigation Grid - Expands Upward */}
         {navExpanded && (
-          <div className="mb-4 rounded-2xl bg-card border border-border shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200 order-1">
+          <div className="mb-4 rounded-2xl bg-card border border-border shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-w-md">
               {allNavItems.map((item) => {
                 const active = path === item.to || (item.to !== "/courses/" && path.startsWith(item.to));
@@ -104,30 +117,17 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
           </div>
         )}
 
-        {/* Settings/Profile Button */}
-        <button
-          onClick={handleSettingsClick}
-          aria-label="Perfil e definições"
-          className={cn(
-            "flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
-            "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
-            "active:scale-95",
-            navExpanded && "scale-95 opacity-75"
-          )}
-        >
-          <User className="h-6 w-6" />
-        </button>
-
-        {/* Primary Navigation Button */}
+        {/* Compass Navigation Button */}
         <button
           onClick={() => setNavExpanded(!navExpanded)}
           aria-label={navExpanded ? "Fechar navegação" : "Abrir navegação"}
           className={cn(
-            "flex h-16 w-16 items-center justify-center rounded-full bg-gradient-brand shadow-lg transition-all duration-300",
-            "hover:shadow-xl text-brand-foreground",
+            "flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all duration-300",
+            "text-brand-foreground hover:shadow-xl",
             "active:scale-95",
+            !navExpanded && "bg-gradient-to-br from-brand to-brand/80",
             navExpanded
-              ? "scale-125 shadow-2xl"
+              ? "scale-125 shadow-2xl bg-gradient-brand"
               : "scale-100 hover:scale-110",
           )}
         >
