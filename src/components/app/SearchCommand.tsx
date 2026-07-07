@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
@@ -157,34 +157,65 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     [groupedResults]
   );
 
+  // Event handlers
+  const handleBackdropClick = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleModalClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.currentTarget.value);
+  }, []);
+
+  const handleClearQuery = useCallback(() => {
+    setQuery("");
+  }, []);
+
+  // Memoized keyboard handler
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Only block if it's one of our shortcuts
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      setOpen(prev => !prev);
+      return;
+    }
+
+    if (e.key === "Escape") {
+      setOpen(false);
+      return;
+    }
+
+    // Only handle nav keys if modal is open
+    if (!open) return;
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex(prev => {
+        const total = flatResults.length;
+        if (total === 0) return 0;
+        if (e.key === "ArrowDown") {
+          return (prev + 1) % total;
+        } else {
+          return (prev - 1 + total) % total;
+        }
+      });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const selected = flatResults[selectedIndex];
+      if (selected?.to) {
+        setOpen(false);
+      }
+    }
+  }, [open, flatResults, selectedIndex]);
+
   // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        return;
-      }
-
-      if (!open) {
-        if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-          e.preventDefault();
-          setOpen(true);
-        }
-        return;
-      }
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % flatResults.length);
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + flatResults.length) % flatResults.length);
-      }
-    };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, flatResults.length]);
+  }, [handleKeyDown]);
 
   // Reset selected index when query changes
   useEffect(() => {
@@ -194,7 +225,10 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
   // Focus input when dialog opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => inputRef.current?.focus(), 0);
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
@@ -229,7 +263,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
           {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={() => setOpen(false)}
+            onClick={handleBackdropClick}
           />
 
           {/* Modal Content */}
@@ -239,7 +273,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
               "rounded-2xl bg-card border border-border shadow-2xl animate-in fade-in zoom-in-95 duration-300",
               "max-h-[80vh] flex flex-col overflow-hidden"
             )}
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleModalClick}
           >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-border px-6 py-4">
@@ -249,7 +283,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 type="text"
                 placeholder="Pesquisa avançada — cursos, instrutores, categorias..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={handleInputChange}
                 className={cn(
                   "flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground",
                   "font-display text-foreground"
@@ -257,7 +291,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
               />
               {query && (
                 <button
-                  onClick={() => setQuery("")}
+                  onClick={handleClearQuery}
                   className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Limpar pesquisa"
                 >
@@ -265,7 +299,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 </button>
               )}
               <button
-                onClick={() => setOpen(false)}
+                onClick={handleBackdropClick}
                 className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Fechar"
               >
