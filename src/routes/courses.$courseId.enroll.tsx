@@ -173,7 +173,7 @@ function Enroll() {
 
         <div>
           <Card className="sticky top-24 p-6">
-            <div className={`flex h-28 items-center justify-center rounded-xl bg-gradient-to-br ${course.color}`}>
+            <div className={`flex h-28 items-center justify-center rounded-xl bg-linear-to-br ${course.color}`}>
               <BookOpen className="h-10 w-10 text-background/90" />
             </div>
             <p className="mt-4 text-sm font-semibold text-primary">{course.category}</p>

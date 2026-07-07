@@ -11,7 +11,7 @@ export function CourseCard({ course }: { course: Course }) {
       params={{ courseId: course.id }}
       className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-1 hover:shadow-brand"
     >
-      <div className={cn("relative h-32 bg-gradient-to-br", course.color)}>
+      <div className={cn("relative h-32 bg-linear-to-br", course.color)}>
         <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-semibold text-foreground">
           {course.level}
         </span>
