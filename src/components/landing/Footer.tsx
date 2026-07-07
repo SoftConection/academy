@@ -1,28 +1,29 @@
 import { Logo } from "@/components/Logo";
+import { Link } from "@tanstack/react-router";
 
 const cols = [
   {
     title: "Plataforma",
     links: [
-      { label: "Cursos", href: "/courses/" },
-      { label: "Certificação", href: "/certificate/OV-2026-AX91KD" },
-      { label: "Para empresas", href: "/#empresas" },
-      { label: "Preços", href: "/courses/" },
+      { label: "Cursos", to: "/courses/" },
+      { label: "Certificação", to: "/certificate/$code", params: { code: "OV-2026-AX91KD" } },
+      { label: "Para empresas", to: "/", hash: "empresas" },
+      { label: "Preços", to: "/courses/" },
     ],
   },
   {
     title: "Recursos",
     links: [
-      { label: "Blog", href: "/" },
-      { label: "Documentação", href: "/" },
-      { label: "Comunidade", href: "/auth" },
+      { label: "Blog", to: "/" },
+      { label: "Documentação", to: "/" },
+      { label: "Comunidade", to: "/auth" },
       { label: "Suporte", href: "mailto:suporte@openvision.academy" },
     ],
   },
   {
     title: "Empresa",
     links: [
-      { label: "Sobre", href: "/#top" },
+      { label: "Sobre", to: "/", hash: "top" },
       { label: "Carreiras", href: "mailto:rh@openvision.academy" },
       { label: "Parcerias", href: "mailto:parcerias@openvision.academy" },
       { label: "Contacto", href: "mailto:equipa@openvision.academy" },
@@ -46,9 +47,20 @@ export function Footer() {
             <ul className="mt-4 space-y-2">
               {c.links.map((l) => (
                 <li key={l.label}>
-                  <a href={l.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    {l.label}
-                  </a>
+                  {"href" in l ? (
+                    <a href={l.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={l.to as never}
+                      params={("params" in l ? l.params : undefined) as never}
+                      hash={"hash" in l ? l.hash : undefined}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {l.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

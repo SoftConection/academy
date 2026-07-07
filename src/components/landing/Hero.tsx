@@ -31,7 +31,7 @@ export function Hero() {
               <Link to="/courses/">Explorar cursos <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="outline" size="xl">
-              <a href="#cursos"><PlayCircle className="h-5 w-5" /> Ver demonstração</a>
+              <Link to="/" hash="cursos"><PlayCircle className="h-5 w-5" /> Ver demonstração</Link>
             </Button>
           </div>
           <dl className="mt-12 grid max-w-md grid-cols-3 gap-6">
