@@ -49,15 +49,6 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
         <div className="ml-auto hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground sm:flex">
           <Search className="h-4 w-4" /> Pesquisar...
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Notificações"
-          onClick={() => toast.info("Nenhuma nova notificação no momento")}
-        >
-          <Bell className="h-5 w-5" />
-        </Button>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-brand text-sm font-bold text-brand-foreground">AD</div>
       </header>
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
@@ -75,7 +66,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
         onClick={handleSettingsClick}
         aria-label="Perfil e definições"
         className={cn(
-          "fixed top-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
+          "fixed top-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
           "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
           "active:scale-95"
         )}
