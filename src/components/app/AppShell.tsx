@@ -12,7 +12,8 @@ import {
   BadgeCheck,
   ClipboardList,
   Webhook,
-  X,
+  Compass,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,11 +31,15 @@ const allNavItems = [
 ];
 
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
-  const [gearExpanded, setGearExpanded] = useState(false);
+  const [navExpanded, setNavExpanded] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   const handleNavClick = () => {
-    setGearExpanded(false);
+    setNavExpanded(false);
+  };
+
+  const handleSettingsClick = () => {
+    toast.info("Perfil e definições — em breve");
   };
 
   return (
@@ -57,18 +62,19 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
 
-      {/* Gear Navigation Expansion */}
-      {gearExpanded && (
+      {/* Navigation Overlay */}
+      {navExpanded && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/40"
-          onClick={() => setGearExpanded(false)}
+          className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm"
+          onClick={() => setNavExpanded(false)}
         />
       )}
 
-      <div className="fixed bottom-6 right-6 z-50">
-        {/* Expanded Grid */}
-        {gearExpanded && (
-          <div className="mb-6 rounded-2xl bg-card border border-border shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-4 items-end">
+        {/* Navigation Grid - Expands Upward */}
+        {navExpanded && (
+          <div className="mb-4 rounded-2xl bg-card border border-border shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200 order-1">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-w-md">
               {allNavItems.map((item) => {
                 const active = path === item.to || (item.to !== "/courses/" && path.startsWith(item.to));
@@ -98,21 +104,36 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
           </div>
         )}
 
-        {/* Gear Button */}
+        {/* Settings/Profile Button */}
         <button
-          onClick={() => setGearExpanded(!gearExpanded)}
-          aria-label={gearExpanded ? "Fechar navegação" : "Abrir navegação"}
+          onClick={handleSettingsClick}
+          aria-label="Perfil e definições"
+          className={cn(
+            "flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
+            "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
+            "active:scale-95",
+            navExpanded && "scale-95 opacity-75"
+          )}
+        >
+          <User className="h-6 w-6" />
+        </button>
+
+        {/* Primary Navigation Button */}
+        <button
+          onClick={() => setNavExpanded(!navExpanded)}
+          aria-label={navExpanded ? "Fechar navegação" : "Abrir navegação"}
           className={cn(
             "flex h-16 w-16 items-center justify-center rounded-full bg-gradient-brand shadow-lg transition-all duration-300",
             "hover:shadow-xl text-brand-foreground",
-            gearExpanded
+            "active:scale-95",
+            navExpanded
               ? "scale-125 shadow-2xl"
               : "scale-100 hover:scale-110",
           )}
         >
-          <Settings className={cn(
+          <Compass className={cn(
             "h-7 w-7 transition-transform duration-300",
-            gearExpanded ? "rotate-180" : "rotate-0"
+            navExpanded ? "rotate-45" : "rotate-0"
           )} />
         </button>
       </div>
