@@ -204,7 +204,7 @@ export function SearchCommand() {
         onClick={() => setOpen(true)}
         aria-label="Pesquisar"
         className={cn(
-          "fixed top-4 right-20 z-50 flex h-10 w-10 items-center justify-center rounded-full",
+          "fixed top-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-full",
           "transition-all duration-300 shadow-lg",
           open
             ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
