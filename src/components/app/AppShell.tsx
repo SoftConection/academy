@@ -17,6 +17,7 @@ import {
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const nav = [
   { group: "Aprender", items: [
@@ -94,7 +95,14 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
           <div className="ml-auto hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground sm:flex">
             <Search className="h-4 w-4" /> Pesquisar...
           </div>
-          <Button variant="ghost" size="icon" aria-label="Notificações"><Bell className="h-5 w-5" /></Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Notificações"
+            onClick={() => toast.info("Nenhuma nova notificação no momento")}
+          >
+            <Bell className="h-5 w-5" />
+          </Button>
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-brand text-sm font-bold text-brand-foreground">AD</div>
         </header>
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

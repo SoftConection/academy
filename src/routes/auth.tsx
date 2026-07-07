@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Mail, Lock, Github, Linkedin } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -43,7 +44,16 @@ function AuthPage() {
 
           <div className="mt-6 grid grid-cols-3 gap-3">
             {[{ i: Mail, l: "Google" }, { i: Github, l: "GitHub" }, { i: Linkedin, l: "LinkedIn" }].map((p) => (
-              <Button key={p.l} variant="outline" className="h-10" aria-label={p.l}><p.i className="h-4 w-4" /></Button>
+              <Button
+                key={p.l}
+                type="button"
+                variant="outline"
+                className="h-10"
+                aria-label={p.l}
+                onClick={() => toast.info(`Login com ${p.l} em breve`)}
+              >
+                <p.i className="h-4 w-4" />
+              </Button>
             ))}
           </div>
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">

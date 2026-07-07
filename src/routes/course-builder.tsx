@@ -4,6 +4,7 @@ import { GripVertical, Plus, Video, FileText, HelpCircle, Trash2 } from "lucide-
 import { AppShell } from "@/components/app/AppShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/course-builder")({
   head: () => ({ meta: [{ title: "Course Builder — OpenVision Academy" }] }),
@@ -49,8 +50,8 @@ function CourseBuilder() {
           className="max-w-md flex-1 rounded-lg border border-input bg-background px-4 py-2 font-display text-lg font-bold outline-none focus:ring-2 focus:ring-ring"
         />
         <div className="flex gap-2">
-          <Button variant="outline">Pré-visualizar</Button>
-          <Button variant="brand">Publicar</Button>
+          <Button variant="outline" onClick={() => toast.info("Pré-visualização disponível em breve")}>Pré-visualizar</Button>
+          <Button variant="brand" onClick={() => toast.success("Curso publicado com sucesso (demo)")}>Publicar</Button>
         </div>
       </div>
 

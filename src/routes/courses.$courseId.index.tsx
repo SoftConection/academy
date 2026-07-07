@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { courses, formatKz } from "@/lib/mock-data";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/courses/$courseId/")({
   head: () => ({
@@ -30,7 +31,7 @@ function CourseDetail() {
     <AppShell title={course.title}>
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className={`relative flex h-56 items-center justify-center rounded-2xl bg-gradient-to-br ${course.color}`}>
+          <div className={`relative flex h-56 items-center justify-center rounded-2xl bg-linear-to-br ${course.color}`}>
             <PlayCircle className="h-16 w-16 text-background/90" />
           </div>
           <p className="mt-6 text-sm font-semibold text-primary">{course.category}</p>
@@ -72,7 +73,14 @@ function CourseDetail() {
                   <div className="h-2 rounded-full bg-gradient-brand" style={{ width: `${course.progress}%` }} />
                 </div>
                 <p className="mt-2 text-sm font-semibold">{course.progress}% concluído</p>
-                <Button variant="brand" size="lg" className="mt-5 w-full">Continuar a aprender</Button>
+                <Button
+                  variant="brand"
+                  size="lg"
+                  className="mt-5 w-full"
+                  onClick={() => toast.info("A abrir a última aula disponível")}
+                >
+                  Continuar a aprender
+                </Button>
               </>
             ) : (
               <>
@@ -80,7 +88,14 @@ function CourseDetail() {
                 <Button asChild variant="brand" size="lg" className="mt-5 w-full">
                   <Link to="/courses/$courseId/enroll" params={{ courseId: course.id }}>Inscrever-me</Link>
                 </Button>
-                <Button variant="outline" size="lg" className="mt-3 w-full">Adicionar à lista</Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="mt-3 w-full"
+                  onClick={() => toast.success("Curso adicionado à sua lista (demo)")}
+                >
+                  Adicionar à lista
+                </Button>
               </>
             )}
             <div className="mt-6 space-y-2 text-sm text-muted-foreground">

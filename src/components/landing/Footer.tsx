@@ -1,9 +1,33 @@
 import { Logo } from "@/components/Logo";
 
 const cols = [
-  { title: "Plataforma", links: ["Cursos", "Certificação", "Para empresas", "Preços"] },
-  { title: "Recursos", links: ["Blog", "Documentação", "Comunidade", "Suporte"] },
-  { title: "Empresa", links: ["Sobre", "Carreiras", "Parcerias", "Contacto"] },
+  {
+    title: "Plataforma",
+    links: [
+      { label: "Cursos", href: "/courses/" },
+      { label: "Certificação", href: "/certificate/OV-2026-AX91KD" },
+      { label: "Para empresas", href: "/#empresas" },
+      { label: "Preços", href: "/courses/" },
+    ],
+  },
+  {
+    title: "Recursos",
+    links: [
+      { label: "Blog", href: "/" },
+      { label: "Documentação", href: "/" },
+      { label: "Comunidade", href: "/auth" },
+      { label: "Suporte", href: "mailto:suporte@openvision.academy" },
+    ],
+  },
+  {
+    title: "Empresa",
+    links: [
+      { label: "Sobre", href: "/#top" },
+      { label: "Carreiras", href: "mailto:rh@openvision.academy" },
+      { label: "Parcerias", href: "mailto:parcerias@openvision.academy" },
+      { label: "Contacto", href: "mailto:equipa@openvision.academy" },
+    ],
+  },
 ];
 
 export function Footer() {
@@ -21,9 +45,9 @@ export function Footer() {
             <h4 className="font-display text-sm font-bold">{c.title}</h4>
             <ul className="mt-4 space-y-2">
               {c.links.map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    {l}
+                <li key={l.label}>
+                  <a href={l.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    {l.label}
                   </a>
                 </li>
               ))}
