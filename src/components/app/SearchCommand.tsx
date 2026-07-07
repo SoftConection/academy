@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { courses } from "@/lib/mock-data";
-import * as Dialog from "@radix-ui/react-dialog";
 
 interface SearchResult {
   type: "course" | "instructor" | "category";
@@ -223,20 +223,23 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
         )} />
       </button>
 
-      {/* Search Dialog */}
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Portal>
+      {/* Search Modal Portal */}
+      {open && createPortal(
+        <>
           {/* Backdrop */}
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200" />
+          <div
+            className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setOpen(false)}
+          />
 
-          {/* Content */}
-          <Dialog.Content
+          {/* Modal Content */}
+          <div
             className={cn(
               "fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2",
               "rounded-2xl bg-card border border-border shadow-2xl animate-in fade-in zoom-in-95 duration-300",
               "max-h-[80vh] flex flex-col overflow-hidden"
             )}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-border px-6 py-4">
@@ -249,7 +252,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 onChange={(e) => setQuery(e.target.value)}
                 className={cn(
                   "flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground",
-                  "font-display"
+                  "font-display text-foreground"
                 )}
               />
               {query && (
@@ -261,9 +264,13 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                   <X className="h-5 w-5" />
                 </button>
               )}
-              <Dialog.Close className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+              <button
+                onClick={() => setOpen(false)}
+                className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Fechar"
+              >
                 <X className="h-5 w-5" />
-              </Dialog.Close>
+              </button>
             </div>
 
             {/* Results */}
@@ -310,8 +317,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                         Cursos
                       </div>
                       <div className="space-y-1">
-                        {groupedResults.course.map((result, idx) => {
-                          const flatIndex = idx;
+                        {groupedResults.course.map((result) => {
                           const isSelected = selectedResult?.id === result.id && selectedResult?.type === "course";
                           return (
                             <ResultItem
@@ -329,7 +335,6 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                               onSelect={() => {
                                 if (result.to) {
                                   setOpen(false);
-                                  // Navigation handled by component rendering
                                 }
                               }}
                             />
@@ -437,9 +442,10 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 </div>
               </div>
             )}
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+          </div>
+        </>,
+        document.body
+      )}
     </>
   );
 }
