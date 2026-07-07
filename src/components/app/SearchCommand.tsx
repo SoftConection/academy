@@ -44,7 +44,11 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   );
 }
 
-export function SearchCommand() {
+interface SearchCommandProps {
+  isInHeader?: boolean;
+}
+
+export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -204,8 +208,9 @@ export function SearchCommand() {
         onClick={() => setOpen(true)}
         aria-label="Pesquisar"
         className={cn(
-          "fixed top-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-full",
+          "flex h-10 w-10 items-center justify-center rounded-full",
           "transition-all duration-300 shadow-lg",
+          !isInHeader && "fixed top-4 left-4 z-50",
           open
             ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
             : "bg-card border-2 border-border hover:bg-secondary hover:border-brand hover:shadow-xl",

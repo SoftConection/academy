@@ -41,7 +41,8 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
 
   return (
     <div className="min-h-screen bg-secondary/30 flex flex-col">
-      <header className="sticky top-0 z-30 flex h-16 items-center border-b border-border bg-card/80 px-4 backdrop-blur-xl sm:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur-xl sm:px-6">
+        <SearchCommand isInHeader={true} />
         <h1 className="font-display text-lg font-bold">{title}</h1>
       </header>
 
@@ -54,9 +55,6 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
           onClick={() => setNavExpanded(false)}
         />
       )}
-
-      {/* Search Command Button - Top Right */}
-      <SearchCommand />
 
       {/* Profile/Settings Button - Top Right */}
       <button
