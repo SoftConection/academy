@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   Brain,
   ShieldCheck,
@@ -30,13 +29,9 @@ export function Features() {
         </p>
       </div>
       <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((f, i) => (
-          <motion.div
+        {features.map((f) => (
+          <div
             key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.45, delay: i * 0.05 }}
             className="group rounded-2xl border border-border bg-card p-7 shadow-soft transition-all hover:-translate-y-1 hover:shadow-brand"
           >
             <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-brand text-brand-foreground">
@@ -44,7 +39,7 @@ export function Features() {
             </div>
             <h3 className="text-lg font-bold">{f.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>

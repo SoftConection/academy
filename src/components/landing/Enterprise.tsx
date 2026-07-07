@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { ArrowRight, BarChart3, BadgeCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -29,13 +28,9 @@ export function Enterprise() {
             </Button>
           </div>
           <div id="certificacao" className="grid gap-4 self-center">
-            {items.map((it, i) => (
-              <motion.div
+            {items.map((it) => (
+              <div
                 key={it.title}
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="flex items-start gap-4 rounded-2xl bg-background/5 p-5 ring-1 ring-background/10"
               >
                 <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-brand text-brand-foreground">
@@ -45,7 +40,7 @@ export function Enterprise() {
                   <h3 className="font-bold text-background">{it.title}</h3>
                   <p className="text-sm text-background/70">{it.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

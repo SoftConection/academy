@@ -1,15 +1,12 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "tailwindcss" source(none);
-@source "../src";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
 }
 
 /*
@@ -194,9 +191,4 @@
   .shadow-soft {
     box-shadow: var(--shadow-soft);
   }
-}
-
-/* Hide legacy badge shown above hero title (temporary fix until rebuild) */
-#top .inline-flex.items-center.gap-2 {
-  display: none !important;
 }
