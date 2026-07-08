@@ -157,10 +157,18 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     [groupedResults]
   );
 
-  // Event handlers
-  const handleBackdropClick = useCallback(() => {
+  const closeModal = useCallback(() => {
     setOpen(false);
   }, []);
+
+  const openModal = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  // Event handlers
+  const handleBackdropClick = useCallback(() => {
+    closeModal();
+  }, [closeModal]);
 
   const handleModalClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -179,12 +187,12 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     // Only block if it's one of our shortcuts
     if ((e.ctrlKey || e.metaKey) && e.key === "k") {
       e.preventDefault();
-      setOpen(prev => !prev);
+      setOpen((prev) => !prev);
       return;
     }
 
     if (e.key === "Escape") {
-      setOpen(false);
+      closeModal();
       return;
     }
 
@@ -193,7 +201,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
 
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex(prev => {
+      setSelectedIndex((prev) => {
         const total = flatResults.length;
         if (total === 0) return 0;
         if (e.key === "ArrowDown") {
@@ -204,12 +212,12 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
       });
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const selected = flatResults[selectedIndex];
-      if (selected?.to) {
-        setOpen(false);
+      const selected = flatResults[selectedIndex] ?? null;
+      if (selected?.to && selected.type === "course") {
+        closeModal();
       }
     }
-  }, [open, flatResults, selectedIndex]);
+  }, [open, flatResults, selectedIndex, closeModal]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -232,6 +240,18 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     }
   }, [open]);
 
+  // Prevent body scroll while modal is open to avoid layout thrashing during portal mount/unmount.
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   const selectedResult = flatResults[selectedIndex];
   const hasResults = flatResults.length > 0;
 
@@ -239,7 +259,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     <>
       {/* Search Icon Button */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={openModal}
         aria-label="Pesquisar"
         className={cn(
           "flex h-10 w-10 items-center justify-center rounded-full",
@@ -259,13 +279,13 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
 
       {/* Search Modal Portal */}
       {open && createPortal(
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={handleBackdropClick}
-          />
-
+        <div
+          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={handleBackdropClick}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Pesquisa avançada"
+        >
           {/* Modal Content */}
           <div
             className={cn(
@@ -405,7 +425,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                                 );
                               }}
                             >
-                              <UserIcon className="h-4 w-4 flex-shrink-0" />
+                              <UserIcon className="h-4 w-4 shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <div className="font-semibold text-sm">
                                   {highlightMatch(result.title, query)}
@@ -446,7 +466,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                                 );
                               }}
                             >
-                              <Tag className="h-4 w-4 flex-shrink-0" />
+                              <Tag className="h-4 w-4 shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <div className="font-semibold text-sm">
                                   {highlightMatch(result.title, query)}
@@ -477,7 +497,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
               </div>
             )}
           </div>
-        </>,
+        </div>,
         document.body
       )}
     </>
@@ -509,7 +529,7 @@ function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItem
         )}
         onMouseEnter={onHover}
       >
-        <Icon className="h-4 w-4 flex-shrink-0" />
+        <Icon className="h-4 w-4 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-sm">
             {highlightMatch(result.title, query)}
@@ -539,7 +559,7 @@ function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItem
       onMouseEnter={onHover}
       onClick={onSelect}
     >
-      <Icon className="h-4 w-4 flex-shrink-0" />
+      <Icon className="h-4 w-4 shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-sm">
           {highlightMatch(result.title, query)}
