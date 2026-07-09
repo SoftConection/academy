@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -30,6 +30,10 @@ const allNavItems = [
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
   const [navExpanded, setNavExpanded] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    setNavExpanded(false);
+  }, [path]);
 
   const handleNavClick = () => {
     setNavExpanded(false);
@@ -111,7 +115,7 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
             "flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all duration-300",
             "text-brand-foreground hover:shadow-xl",
             "active:scale-95",
-            !navExpanded && "bg-gradient-to-br from-brand to-brand/80",
+            !navExpanded && "bg-linear-to-br from-brand to-brand/80",
             navExpanded
               ? "scale-125 shadow-2xl bg-gradient-brand"
               : "scale-100 hover:scale-110",

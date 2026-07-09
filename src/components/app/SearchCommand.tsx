@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { courses } from "@/lib/mock-data";
@@ -53,6 +53,10 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const openRef = useRef(false);
+  const selectedIndexRef = useRef(0);
+  const flatResultsRef = useRef<SearchResult[]>([]);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Extract unique instructors and categories from courses
   const uniqueInstructors = useMemo(() => {
@@ -173,48 +177,73 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     setQuery("");
   }, []);
 
-  // Memoized keyboard handler
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // Only block if it's one of our shortcuts
-    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-      e.preventDefault();
-      setOpen((prev) => !prev);
-      return;
-    }
-
-    if (e.key === "Escape") {
-      closeModal();
-      return;
-    }
-
-    // Only handle nav keys if modal is open
-    if (!open) return;
-
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedIndex((prev) => {
-        const total = flatResults.length;
-        if (total === 0) return 0;
-        if (e.key === "ArrowDown") {
-          return (prev + 1) % total;
-        } else {
-          return (prev - 1 + total) % total;
-        }
-      });
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      const selected = flatResults[selectedIndex] ?? null;
-      if (selected?.to && selected.type === "course") {
-        closeModal();
-      }
-    }
-  }, [open, flatResults, selectedIndex, closeModal]);
-
-  // Keyboard navigation
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+    openRef.current = open;
+  }, [open]);
+
+  useEffect(() => {
+    selectedIndexRef.current = selectedIndex;
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    flatResultsRef.current = flatResults;
+  }, [flatResults]);
+
+  // Keyboard navigation - registered once to avoid listener churn under fast state updates.
+  useEffect(() => {
+    const onGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isEditableTarget =
+        !!target && (target.isContentEditable || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT");
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen((prev) => !prev);
+        return;
+      }
+
+      if (e.key === "Escape") {
+        if (!openRef.current) return;
+        e.preventDefault();
+        e.stopPropagation();
+        setOpen(false);
+        return;
+      }
+
+      if (!openRef.current) return;
+
+      if (isEditableTarget && target !== inputRef.current) {
+        return;
+      }
+
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const total = flatResultsRef.current.length;
+        if (total === 0) {
+          setSelectedIndex(0);
+          return;
+        }
+        setSelectedIndex((prev) => {
+          if (e.key === "ArrowDown") return (prev + 1) % total;
+          return (prev - 1 + total) % total;
+        });
+        return;
+      }
+
+      if (e.key === "Enter") {
+        const selected = flatResultsRef.current[selectedIndexRef.current] ?? null;
+        if (selected?.to && selected.type === "course") {
+          e.preventDefault();
+          setOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", onGlobalKeyDown);
+    return () => window.removeEventListener("keydown", onGlobalKeyDown);
+  }, []);
 
   // Reset selected index when query changes
   useEffect(() => {
@@ -231,14 +260,20 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     }
   }, [open]);
 
-  // Close search panel on outside click.
+  // Route changes should always reset transient search state.
   useEffect(() => {
-    if (!open) return;
+    setOpen(false);
+    setQuery("");
+    setSelectedIndex(0);
+  }, [pathname]);
 
+  // Close search panel on outside click with a single stable listener.
+  useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
+      if (!openRef.current) return;
       const target = event.target as Node;
       if (panelRef.current && !panelRef.current.contains(target)) {
-        closeModal();
+        setOpen(false);
       }
     };
 
@@ -247,7 +282,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     return () => {
       document.removeEventListener("mousedown", onPointerDown);
     };
-  }, [open, closeModal]);
+  }, []);
 
   const selectedResult = flatResults[selectedIndex];
   const hasResults = flatResults.length > 0;
@@ -279,7 +314,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
         <div
           ref={panelRef}
           className={cn(
-            "fixed z-[70] w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
+            "fixed z-70 w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
             "rounded-2xl border border-border bg-card shadow-2xl",
             isInHeader
               ? "left-1/2 top-20 -translate-x-1/2"
