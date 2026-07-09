@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -45,14 +45,23 @@ function highlightMatch(text: string, query: string): React.ReactNode {
 
 interface SearchCommandProps {
   isInHeader?: boolean;
+  disabled?: boolean;
+  closeSignal?: number;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
+export function SearchCommand({
+  isInHeader = false,
+  disabled = false,
+  closeSignal,
+  onOpenChange,
+}: SearchCommandProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const openRef = useRef(false);
   const selectedIndexRef = useRef(0);
   const flatResultsRef = useRef<SearchResult[]>([]);
@@ -166,8 +175,9 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
   }, []);
 
   const openModal = useCallback(() => {
+    if (disabled) return;
     setOpen(true);
-  }, []);
+  }, [disabled]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.currentTarget.value);
@@ -250,14 +260,16 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     setSelectedIndex(0);
   }, [query]);
 
-  // Focus input when dialog opens
+  // Focus management for faster perceived response and keyboard continuity.
   useEffect(() => {
     if (open) {
-      const timer = setTimeout(() => {
+      const rafId = requestAnimationFrame(() => {
         inputRef.current?.focus();
-      }, 50);
-      return () => clearTimeout(timer);
+      });
+      return () => cancelAnimationFrame(rafId);
     }
+
+    triggerRef.current?.focus();
   }, [open]);
 
   // Route changes should always reset transient search state.
@@ -266,6 +278,16 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     setQuery("");
     setSelectedIndex(0);
   }, [pathname]);
+
+  // Allow parent shell to force-close search (for panel exclusivity).
+  useEffect(() => {
+    if (closeSignal === undefined) return;
+    setOpen(false);
+  }, [closeSignal]);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
 
   // Close search panel on outside click with a single stable listener.
   useEffect(() => {
@@ -291,8 +313,12 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     <div className={cn("relative", !isInHeader && "fixed top-4 left-4 z-50")}>
       {/* Search Icon Button */}
       <button
+        ref={triggerRef}
         onClick={openModal}
+        disabled={disabled}
         aria-label="Pesquisar"
+        aria-expanded={open}
+        aria-controls="search-command-panel"
         className={cn(
           "flex h-10 w-10 items-center justify-center rounded-full",
           "transition-all duration-300 shadow-lg",
@@ -300,6 +326,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
           open
             ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
             : "bg-card border-2 border-border hover:bg-secondary hover:border-brand hover:shadow-xl",
+          disabled && "opacity-50 cursor-not-allowed hover:bg-card hover:border-border hover:shadow-lg",
           "active:scale-95"
         )}
       >
@@ -312,6 +339,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
       {/* Search Panel */}
       {open && (
         <div
+          id="search-command-panel"
           ref={panelRef}
           className={cn(
             "fixed z-70 w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
@@ -392,7 +420,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2 px-3 py-3">
+                <div className="space-y-2 px-3 py-3" role="listbox" aria-label="Resultados da pesquisa">
                   {/* Courses Section */}
                   {groupedResults.course.length > 0 && (
                     <div>
@@ -540,7 +568,7 @@ interface ResultItemProps {
   onSelect: () => void;
 }
 
-function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItemProps) {
+const ResultItem = memo(function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItemProps) {
   const Icon = result.icon;
   const metadata = result.metadata as any;
 
@@ -556,6 +584,8 @@ function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItem
             : "bg-secondary text-foreground hover:bg-secondary/80"
         )}
         onMouseEnter={onHover}
+        role="option"
+        aria-selected={isSelected}
       >
         <Icon className="h-4 w-4 shrink-0" />
         <div className="flex-1 min-w-0">
@@ -586,6 +616,8 @@ function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItem
       )}
       onMouseEnter={onHover}
       onClick={onSelect}
+      role="option"
+      aria-selected={isSelected}
     >
       <Icon className="h-4 w-4 shrink-0" />
       <div className="flex-1 min-w-0">
@@ -596,4 +628,4 @@ function ResultItem({ result, query, isSelected, onHover, onSelect }: ResultItem
       </div>
     </div>
   );
-}
+});

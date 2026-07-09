@@ -29,11 +29,18 @@ const allNavItems = [
 
 export function AppShell({ title, children }: { title: string; children: ReactNode }) {
   const [navExpanded, setNavExpanded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchCloseSignal, setSearchCloseSignal] = useState(0);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     setNavExpanded(false);
   }, [path]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    setNavExpanded(false);
+  }, [searchOpen]);
 
   const handleNavClick = () => {
     setNavExpanded(false);
@@ -46,7 +53,12 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
   return (
     <div className="min-h-screen bg-secondary/30 flex flex-col">
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur-xl sm:px-6">
-        <SearchCommand isInHeader={true} />
+        <SearchCommand
+          isInHeader={true}
+          disabled={navExpanded}
+          closeSignal={searchCloseSignal}
+          onOpenChange={setSearchOpen}
+        />
         <h1 className="font-display text-lg font-bold">{title}</h1>
       </header>
 
@@ -63,10 +75,12 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
       {/* Profile/Settings Button - Top Right */}
       <button
         onClick={handleSettingsClick}
+        disabled={navExpanded || searchOpen}
         aria-label="Perfil e definições"
         className={cn(
           "fixed top-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-border shadow-lg transition-all duration-300",
           "hover:bg-secondary hover:border-brand hover:shadow-xl text-muted-foreground hover:text-foreground",
+          (navExpanded || searchOpen) && "opacity-50 cursor-not-allowed hover:bg-card hover:border-border hover:shadow-lg",
           "active:scale-95"
         )}
       >
@@ -109,7 +123,15 @@ export function AppShell({ title, children }: { title: string; children: ReactNo
 
         {/* Compass Navigation Button */}
         <button
-          onClick={() => setNavExpanded(!navExpanded)}
+          onClick={() => {
+            setNavExpanded((prev) => {
+              const next = !prev;
+              if (next) {
+                setSearchCloseSignal((current) => current + 1);
+              }
+              return next;
+            });
+          }}
           aria-label={navExpanded ? "Fechar navegação" : "Abrir navegação"}
           className={cn(
             "flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all duration-300",
