@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -53,6 +52,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Extract unique instructors and categories from courses
   const uniqueInstructors = useMemo(() => {
@@ -165,15 +165,6 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     setOpen(true);
   }, []);
 
-  // Event handlers
-  const handleBackdropClick = useCallback(() => {
-    closeModal();
-  }, [closeModal]);
-
-  const handleModalClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.currentTarget.value);
   }, []);
@@ -240,23 +231,29 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
     }
   }, [open]);
 
-  // Prevent body scroll while modal is open to avoid layout thrashing during portal mount/unmount.
+  // Close search panel on outside click.
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (panelRef.current && !panelRef.current.contains(target)) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("mousedown", onPointerDown);
     };
-  }, [open]);
+  }, [open, closeModal]);
 
   const selectedResult = flatResults[selectedIndex];
   const hasResults = flatResults.length > 0;
 
   return (
-    <>
+    <div className={cn("relative", !isInHeader && "fixed top-4 left-4 z-50")}>
       {/* Search Icon Button */}
       <button
         onClick={openModal}
@@ -277,24 +274,22 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
         )} />
       </button>
 
-      {/* Search Modal Portal */}
-      {open && createPortal(
+      {/* Search Panel */}
+      {open && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={handleBackdropClick}
+          ref={panelRef}
+          className={cn(
+            "fixed z-[70] w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
+            "rounded-2xl border border-border bg-card shadow-2xl",
+            isInHeader
+              ? "left-1/2 top-20 -translate-x-1/2"
+              : "left-1/2 top-24 -translate-x-1/2",
+            "max-h-[75vh] flex flex-col overflow-hidden"
+          )}
           role="dialog"
           aria-modal="true"
           aria-label="Pesquisa avançada"
         >
-          {/* Modal Content */}
-          <div
-            className={cn(
-              "fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2",
-              "rounded-2xl bg-card border border-border shadow-2xl animate-in fade-in zoom-in-95 duration-300",
-              "max-h-[80vh] flex flex-col overflow-hidden"
-            )}
-            onClick={handleModalClick}
-          >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-border px-6 py-4">
               <Search className="h-5 w-5 text-brand" />
@@ -319,7 +314,7 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 </button>
               )}
               <button
-                onClick={handleBackdropClick}
+                onClick={closeModal}
                 className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Fechar"
               >
@@ -496,11 +491,9 @@ export function SearchCommand({ isInHeader = false }: SearchCommandProps) {
                 </div>
               </div>
             )}
-          </div>
-        </div>,
-        document.body
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
