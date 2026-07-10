@@ -45,16 +45,10 @@ function highlightMatch(text: string, query: string): React.ReactNode {
 
 interface SearchCommandProps {
   isInHeader?: boolean;
-  disabled?: boolean;
-  closeSignal?: number;
-  onOpenChange?: (open: boolean) => void;
 }
 
 export function SearchCommand({
   isInHeader = false,
-  disabled = false,
-  closeSignal,
-  onOpenChange,
 }: SearchCommandProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -62,10 +56,6 @@ export function SearchCommand({
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const openRef = useRef(false);
-  const disabledRef = useRef(false);
-  const selectedIndexRef = useRef(0);
-  const flatResultsRef = useRef<SearchResult[]>([]);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -221,9 +211,8 @@ export function SearchCommand({
   }, []);
 
   const openModal = useCallback(() => {
-    if (disabled) return;
-    setOpen(true);
-  }, [disabled]);
+    setOpen((prev) => !prev);
+  }, []);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.currentTarget.value);
@@ -231,80 +220,6 @@ export function SearchCommand({
 
   const handleClearQuery = useCallback(() => {
     setQuery("");
-  }, []);
-
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
-
-  useEffect(() => {
-    disabledRef.current = disabled;
-  }, [disabled]);
-
-  useEffect(() => {
-    selectedIndexRef.current = selectedIndex;
-  }, [selectedIndex]);
-
-  useEffect(() => {
-    flatResultsRef.current = flatResults;
-  }, [flatResults]);
-
-  // Keyboard navigation - registered once to avoid listener churn under fast state updates.
-  useEffect(() => {
-    const onGlobalKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      const tag = target?.tagName;
-      const isEditableTarget =
-        !!target && (target.isContentEditable || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT");
-
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        if (disabledRef.current && !openRef.current) return;
-        e.preventDefault();
-        e.stopPropagation();
-        setOpen((prev) => !prev);
-        return;
-      }
-
-      if (e.key === "Escape") {
-        if (!openRef.current) return;
-        e.preventDefault();
-        e.stopPropagation();
-        setOpen(false);
-        return;
-      }
-
-      if (!openRef.current) return;
-
-      if (isEditableTarget && target !== inputRef.current) {
-        return;
-      }
-
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        const total = flatResultsRef.current.length;
-        if (total === 0) {
-          setSelectedIndex(0);
-          return;
-        }
-        setSelectedIndex((prev) => {
-          if (e.key === "ArrowDown") return (prev + 1) % total;
-          return (prev - 1 + total) % total;
-        });
-        return;
-      }
-
-      if (e.key === "Enter") {
-        const selected = flatResultsRef.current[selectedIndexRef.current] ?? null;
-        if (selected?.to && selected.type === "course") {
-          e.preventDefault();
-          void navigate({ to: selected.to as never });
-          setOpen(false);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", onGlobalKeyDown);
-    return () => window.removeEventListener("keydown", onGlobalKeyDown);
   }, []);
 
   // Reset selected index when query changes
@@ -331,33 +246,6 @@ export function SearchCommand({
     setSelectedIndex(0);
   }, [pathname]);
 
-  // Allow parent shell to force-close search (for panel exclusivity).
-  useEffect(() => {
-    if (closeSignal === undefined) return;
-    setOpen(false);
-  }, [closeSignal]);
-
-  useEffect(() => {
-    onOpenChange?.(open);
-  }, [open, onOpenChange]);
-
-  // Close search panel on outside click with a single stable listener.
-  useEffect(() => {
-    const onPointerDown = (event: MouseEvent) => {
-      if (!openRef.current) return;
-      const target = event.target as Node;
-      if (panelRef.current && !panelRef.current.contains(target)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", onPointerDown);
-
-    return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-    };
-  }, []);
-
   const selectedResult = flatResults[selectedIndex];
   const hasResults = flatResults.length > 0;
 
@@ -367,7 +255,6 @@ export function SearchCommand({
       <button
         ref={triggerRef}
         onClick={openModal}
-        disabled={disabled}
         aria-label="Pesquisar"
         aria-expanded={open}
         aria-controls="search-command-panel"
@@ -378,7 +265,6 @@ export function SearchCommand({
           open
             ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
             : "bg-card border-2 border-border hover:bg-secondary hover:border-brand hover:shadow-xl",
-          disabled && "opacity-50 cursor-not-allowed hover:bg-card hover:border-border hover:shadow-lg",
           "active:scale-95"
         )}
       >
@@ -414,6 +300,33 @@ export function SearchCommand({
                 placeholder="Pesquisa avançada — cursos, instrutores, categorias..."
                 value={query}
                 onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    e.preventDefault();
+                    closeModal();
+                    return;
+                  }
+
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const total = flatResults.length;
+                    if (total === 0) return;
+                    setSelectedIndex((prev) => {
+                      if (e.key === "ArrowDown") return (prev + 1) % total;
+                      return (prev - 1 + total) % total;
+                    });
+                    return;
+                  }
+
+                  if (e.key === "Enter") {
+                    const selected = flatResults[selectedIndex] ?? null;
+                    if (selected?.to && selected.type === "course") {
+                      e.preventDefault();
+                      void navigate({ to: selected.to as never });
+                      closeModal();
+                    }
+                  }
+                }}
                 className={cn(
                   "flex-1 bg-transparent text-lg outline-none placeholder:text-muted-foreground",
                   "font-display text-foreground"
