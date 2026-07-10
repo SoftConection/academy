@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Search, X, BookOpen, User as UserIcon, Tag, Sparkles, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { courses } from "@/lib/mock-data";
@@ -63,33 +63,74 @@ export function SearchCommand({
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const openRef = useRef(false);
+  const disabledRef = useRef(false);
   const selectedIndexRef = useRef(0);
   const flatResultsRef = useRef<SearchResult[]>([]);
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Extract unique instructors and categories from courses
-  const uniqueInstructors = useMemo(() => {
-    const instructors = new Set(courses.map((c) => c.instructor));
-    return Array.from(instructors);
+  const courseSearchIndex = useMemo(() => {
+    return courses.map((course) => ({
+      course,
+      normalizedTitle: normalizeText(course.title),
+      normalizedSummary: normalizeText(course.summary),
+      normalizedCategory: normalizeText(course.category),
+    }));
   }, []);
 
-  const uniqueCategories = useMemo(() => {
-    const categories = new Set(courses.map((c) => c.category));
-    return Array.from(categories);
+  const instructorStats = useMemo(() => {
+    const map = new Map<
+      string,
+      { normalized: string; courses: number; totalRating: number }
+    >();
+
+    courses.forEach((course) => {
+      const current = map.get(course.instructor);
+      if (current) {
+        current.courses += 1;
+        current.totalRating += course.rating;
+      } else {
+        map.set(course.instructor, {
+          normalized: normalizeText(course.instructor),
+          courses: 1,
+          totalRating: course.rating,
+        });
+      }
+    });
+
+    return map;
+  }, []);
+
+  const categoryStats = useMemo(() => {
+    const map = new Map<string, { normalized: string; courses: number }>();
+
+    courses.forEach((course) => {
+      const current = map.get(course.category);
+      if (current) {
+        current.courses += 1;
+      } else {
+        map.set(course.category, {
+          normalized: normalizeText(course.category),
+          courses: 1,
+        });
+      }
+    });
+
+    return map;
   }, []);
 
   // Search results
   const results = useMemo<SearchResult[]>(() => {
     if (!query.trim()) return [];
 
-    const normalizedQuery = normalizeText(query.toLowerCase());
+    const normalizedQuery = normalizeText(query);
     const searchResults: SearchResult[] = [];
 
     // Search courses
-    courses.forEach((course) => {
-      const titleMatch = normalizeText(course.title).includes(normalizedQuery);
-      const summaryMatch = normalizeText(course.summary).includes(normalizedQuery);
-      const categoryMatch = normalizeText(course.category).includes(normalizedQuery);
+    courseSearchIndex.forEach(({ course, normalizedTitle, normalizedSummary, normalizedCategory }) => {
+      const titleMatch = normalizedTitle.includes(normalizedQuery);
+      const summaryMatch = normalizedSummary.includes(normalizedQuery);
+      const categoryMatch = normalizedCategory.includes(normalizedQuery);
 
       if (titleMatch || summaryMatch || categoryMatch) {
         searchResults.push({
@@ -109,36 +150,33 @@ export function SearchCommand({
     });
 
     // Search instructors
-    uniqueInstructors.forEach((instructor) => {
-      if (normalizeText(instructor).includes(normalizedQuery)) {
-        const instructorCourses = courses.filter((c) => c.instructor === instructor);
+    instructorStats.forEach((stats, instructor) => {
+      if (stats.normalized.includes(normalizedQuery)) {
         searchResults.push({
           type: "instructor",
           id: instructor,
           title: instructor,
-          subtitle: `${instructorCourses.length} ${instructorCourses.length === 1 ? "curso" : "cursos"}`,
+          subtitle: `${stats.courses} ${stats.courses === 1 ? "curso" : "cursos"}`,
           icon: UserIcon,
           metadata: {
-            courseCount: instructorCourses.length,
-            avgRating:
-              instructorCourses.reduce((sum, c) => sum + c.rating, 0) / instructorCourses.length,
+            courseCount: stats.courses,
+            avgRating: stats.totalRating / stats.courses,
           },
         });
       }
     });
 
     // Search categories
-    uniqueCategories.forEach((category) => {
-      if (normalizeText(category).includes(normalizedQuery)) {
-        const categoryCoursesCount = courses.filter((c) => c.category === category).length;
+    categoryStats.forEach((stats, category) => {
+      if (stats.normalized.includes(normalizedQuery)) {
         searchResults.push({
           type: "category",
           id: category,
           title: category,
-          subtitle: `${categoryCoursesCount} ${categoryCoursesCount === 1 ? "curso" : "cursos"}`,
+          subtitle: `${stats.courses} ${stats.courses === 1 ? "curso" : "cursos"}`,
           icon: Tag,
           metadata: {
-            courseCount: categoryCoursesCount,
+            courseCount: stats.courses,
           },
         });
       }
@@ -147,7 +185,7 @@ export function SearchCommand({
     // Sort by type priority (courses first, then instructors, then categories)
     const priority = { course: 0, instructor: 1, category: 2 };
     return searchResults.sort((a, b) => priority[a.type] - priority[b.type]);
-  }, [query, uniqueInstructors, uniqueCategories]);
+  }, [query, courseSearchIndex, instructorStats, categoryStats]);
 
   // Group results by type
   const groupedResults = useMemo(() => {
@@ -169,6 +207,14 @@ export function SearchCommand({
     () => [...groupedResults.course, ...groupedResults.instructor, ...groupedResults.category],
     [groupedResults]
   );
+
+  const flatIndexByKey = useMemo(() => {
+    const map = new Map<string, number>();
+    flatResults.forEach((result, index) => {
+      map.set(`${result.type}:${result.id}`, index);
+    });
+    return map;
+  }, [flatResults]);
 
   const closeModal = useCallback(() => {
     setOpen(false);
@@ -192,6 +238,10 @@ export function SearchCommand({
   }, [open]);
 
   useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
+
+  useEffect(() => {
     selectedIndexRef.current = selectedIndex;
   }, [selectedIndex]);
 
@@ -208,6 +258,7 @@ export function SearchCommand({
         !!target && (target.isContentEditable || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT");
 
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        if (disabledRef.current && !openRef.current) return;
         e.preventDefault();
         e.stopPropagation();
         setOpen((prev) => !prev);
@@ -246,6 +297,7 @@ export function SearchCommand({
         const selected = flatResultsRef.current[selectedIndexRef.current] ?? null;
         if (selected?.to && selected.type === "course") {
           e.preventDefault();
+          void navigate({ to: selected.to as never });
           setOpen(false);
         }
       }
@@ -438,11 +490,8 @@ export function SearchCommand({
                               query={query}
                               isSelected={isSelected}
                               onHover={() => {
-                                setSelectedIndex(
-                                  flatResults.findIndex(
-                                    (r) => r.id === result.id && r.type === "course"
-                                  )
-                                );
+                                const index = flatIndexByKey.get(`course:${result.id}`);
+                                if (index !== undefined) setSelectedIndex(index);
                               }}
                               onSelect={() => {
                                 if (result.to) {
@@ -476,11 +525,8 @@ export function SearchCommand({
                                   : "bg-secondary text-foreground hover:bg-secondary/80"
                               )}
                               onMouseEnter={() => {
-                                setSelectedIndex(
-                                  flatResults.findIndex(
-                                    (r) => r.id === result.id && r.type === "instructor"
-                                  )
-                                );
+                                const index = flatIndexByKey.get(`instructor:${result.id}`);
+                                if (index !== undefined) setSelectedIndex(index);
                               }}
                             >
                               <UserIcon className="h-4 w-4 shrink-0" />
@@ -517,11 +563,8 @@ export function SearchCommand({
                                   : "bg-secondary text-foreground hover:bg-secondary/80"
                               )}
                               onMouseEnter={() => {
-                                setSelectedIndex(
-                                  flatResults.findIndex(
-                                    (r) => r.id === result.id && r.type === "category"
-                                  )
-                                );
+                                const index = flatIndexByKey.get(`category:${result.id}`);
+                                if (index !== undefined) setSelectedIndex(index);
                               }}
                             >
                               <Tag className="h-4 w-4 shrink-0" />
