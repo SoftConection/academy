@@ -54,7 +54,6 @@ export function SearchCommand({
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -246,12 +245,25 @@ export function SearchCommand({
     setSelectedIndex(0);
   }, [pathname]);
 
+  // Global shortcut similar to command palettes.
+  useEffect(() => {
+    const onGlobalKeyDown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "k") return;
+
+      event.preventDefault();
+      setOpen(true);
+    };
+
+    window.addEventListener("keydown", onGlobalKeyDown);
+    return () => window.removeEventListener("keydown", onGlobalKeyDown);
+  }, []);
+
   const selectedResult = flatResults[selectedIndex];
   const hasResults = flatResults.length > 0;
 
   return (
     <div className={cn("relative", !isInHeader && "fixed top-4 left-4 z-50")}>
-      {/* Search Icon Button */}
+      {/* Search Trigger */}
       <button
         ref={triggerRef}
         onClick={openModal}
@@ -259,38 +271,45 @@ export function SearchCommand({
         aria-expanded={open}
         aria-controls="search-command-panel"
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-full",
-          "transition-all duration-300 shadow-lg",
-          !isInHeader && "fixed top-4 left-4 z-50",
-          open
-            ? "bg-gradient-brand border-2 border-brand/50 scale-110 shadow-xl"
-            : "bg-card border-2 border-border hover:bg-secondary hover:border-brand hover:shadow-xl",
-          "active:scale-95"
+          "group flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2",
+          "text-sm text-muted-foreground transition-all duration-200",
+          "hover:border-brand/50 hover:bg-secondary hover:text-foreground",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
+          isInHeader && "w-full max-w-xl",
+          !isInHeader && "w-[300px]"
         )}
       >
-        <Search className={cn(
-          "h-5 w-5 transition-all duration-300",
-          open ? "text-brand-foreground rotate-45 scale-110" : "text-muted-foreground hover:text-foreground"
-        )} />
+        <Search className="h-4 w-4 shrink-0 text-brand" />
+        <span className="truncate text-left">
+          Pesquisar cursos, instrutores e categorias...
+        </span>
+        <span className="ml-auto inline-flex items-center rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          Ctrl K
+        </span>
       </button>
 
       {/* Search Panel */}
       {open && (
-        <div
-          id="search-command-panel"
-          ref={panelRef}
-          className={cn(
-            "fixed z-70 w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
-            "rounded-2xl border border-border bg-card shadow-2xl",
-            isInHeader
-              ? "left-1/2 top-20 -translate-x-1/2"
-              : "left-1/2 top-24 -translate-x-1/2",
-            "max-h-[75vh] flex flex-col overflow-hidden"
-          )}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Pesquisa avançada"
-        >
+        <>
+          <button
+            aria-label="Fechar pesquisa"
+            className="fixed inset-0 z-60 bg-foreground/30 backdrop-blur-sm"
+            onClick={closeModal}
+          />
+          <div
+            id="search-command-panel"
+            className={cn(
+              "fixed z-70 w-[92vw] max-w-2xl animate-in fade-in zoom-in-95 duration-200",
+              "rounded-2xl border border-border bg-card shadow-2xl",
+              isInHeader
+                ? "left-1/2 top-20 -translate-x-1/2"
+                : "left-1/2 top-24 -translate-x-1/2",
+              "max-h-[75vh] flex flex-col overflow-hidden"
+            )}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Pesquisa avançada"
+          >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-border px-6 py-4">
               <Search className="h-5 w-5 text-brand" />
@@ -510,7 +529,8 @@ export function SearchCommand({
                 </div>
               </div>
             )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
